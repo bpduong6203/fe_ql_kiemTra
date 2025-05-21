@@ -23,7 +23,7 @@ const HomePage = () => {
             </p>
             <div className="flex justify-center gap-4">
               <Link
-                to="/auth/login"
+                to="/login"
                 className={cn(
                   'inline-block px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-gray-100',
                 )}
@@ -31,7 +31,7 @@ const HomePage = () => {
                 Đăng Nhập
               </Link>
               <Link
-                to="/auth/register"
+                to="/register"
                 className={cn(
                   'inline-block px-6 py-3 bg-blue-800 text-white font-semibold rounded-lg shadow hover:bg-blue-900',
                 )}

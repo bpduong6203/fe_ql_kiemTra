@@ -1,5 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
+import type { DonVi } from '@/types/interfaces';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, 
@@ -76,5 +77,40 @@ export async function uploadFile(file: File): Promise<{ fileName: string; url: s
   }
 }
 
+//================ Don Vi ====================================
+
+export async function getDonVis(): Promise<DonVi[]> {
+  return apiFetch('/donvi', { method: 'GET' });
+}
+
+export async function getDonVi(id: string): Promise<DonVi> {
+  return apiFetch(`/donvi/${id}`, { method: 'GET' });
+}
+
+export async function createDonVi(data: Partial<DonVi>): Promise<DonVi> {
+  return apiFetch('/donvi', { method: 'POST', data });
+}
+
+export async function updateDonVi(id: string, data: Partial<DonVi>): Promise<DonVi> {
+  return apiFetch(`/donvi/${id}`, { method: 'PUT', data });
+}
+
+export async function softDeleteDonVi(id: string): Promise<{ message: string }> {
+  return apiFetch(`/donvi/soft/${id}`, { method: 'DELETE' });
+}
+
+export async function hardDeleteDonVi(id: string): Promise<{ message: string }> {
+  return apiFetch(`/donvi/hard/${id}`, { method: 'DELETE' });
+}
+
+//============================================================
+
+
+
+
+// Lấy thông tin user để kiểm tra role
+export async function getUserInfo(): Promise<{ username: string; roles: string }> {
+  return apiFetch('/auth/user', { method: 'GET' });
+}
 
 

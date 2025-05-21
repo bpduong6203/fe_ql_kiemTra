@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiFetch } from '@/lib/api';
+import { getDonVis, createDonVi, updateDonVi, softDeleteDonVi, hardDeleteDonVi, getUserInfo } from '@/lib/api';
 import GenericModal from '@/components/generic-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,52 +18,40 @@ export default function DonViPage() {
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
   const [selectedDonVi, setSelectedDonVi] = useState<DonVi | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [userRoles, setUserRoles] = useState<string | null>(null);
+
+  // Lấy thông tin user để kiểm tra role
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      const userInfo = await getUserInfo();
+      setUserRoles(userInfo.roles);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+      toast.error('Lỗi khi lấy thông tin người dùng');
+    }
+  }, []);
 
   const fetchDonVi = useCallback(async () => {
     try {
       setLoading(true);
-      // Giả lập dữ liệu đơn vị
-      const mockData: DonVi[] = [
-        {
-          id: '1',
-          tenDonVi: 'Đơn vị A',
-          diaChi: '123 Đường A, Hà Nội',
-          soDienThoai: '0123456789',
-          email: 'donvia@example.com',
-          nguoiDaiDien: 'Nguyễn Văn A',
-          chucVuNguoiDaiDien: 'Giám đốc',
-        },
-        {
-          id: '2',
-          tenDonVi: 'Đơn vị B',
-          diaChi: '456 Đường B, TP.HCM',
-          soDienThoai: '0987654321',
-          email: 'donvib@example.com',
-          nguoiDaiDien: 'Trần Thị B',
-          chucVuNguoiDaiDien: 'Phó giám đốc',
-        },
-        {
-          id: '3',
-          tenDonVi: 'Đơn vị C',
-          email: 'donvic@example.com',
-        },
-      ];
-      const sortedDonVi = mockData.sort((a: DonVi, b: DonVi) =>
-        sortOrder === 'asc' ? a.tenDonVi.localeCompare(b.tenDonVi) : b.tenDonVi.localeCompare(a.tenDonVi)
+      const donVis = await getDonVis();
+      const sortedDonVi = donVis.sort((a: DonVi, b: DonVi) =>
+        sortOrder === 'asc' ? a.tenDonVi.localeCompare(b.tenDonVi) : b.tenDonVi.localeCompare(b.tenDonVi)
       );
       setDonViList(sortedDonVi);
       setFilteredDonViList(sortedDonVi);
     } catch (error) {
       console.error('Error fetching don vi:', error);
-      toast.error('Lỗi khi tải dữ liệu');
+      toast.error('Lỗi khi tải dữ liệu đơn vị');
     } finally {
       setLoading(false);
     }
   }, [sortOrder]);
 
   useEffect(() => {
+    fetchUserInfo();
     fetchDonVi();
-  }, [fetchDonVi]);
+  }, [fetchUserInfo, fetchDonVi]);
 
   // Lọc đơn vị theo thanh tìm kiếm
   useEffect(() => {
@@ -77,7 +65,7 @@ export default function DonViPage() {
     const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     setSortOrder(newSortOrder);
     setFilteredDonViList([...filteredDonViList].sort((a, b) =>
-      newSortOrder === 'asc' ? a.tenDonVi.localeCompare(b.tenDonVi) : b.tenDonVi.localeCompare(a.tenDonVi)
+      newSortOrder === 'asc' ? a.tenDonVi.localeCompare(b.tenDonVi) : b.tenDonVi.localeCompare(b.tenDonVi)
     ));
   };
 
@@ -102,13 +90,15 @@ export default function DonViPage() {
   const handleSave = async (data: any) => {
     try {
       const payload = { ...data };
-      await apiFetch(selectedDonVi ? `/donvi/${selectedDonVi.id}` : '/donvi', {
-        method: selectedDonVi ? 'PUT' : 'POST',
-        data: payload,
-      });
+      if (modalMode === 'create') {
+        await createDonVi(payload);
+        toast.success('Tạo đơn vị thành công');
+      } else {
+        await updateDonVi(selectedDonVi!.id, payload);
+        toast.success('Cập nhật đơn vị thành công');
+      }
       fetchDonVi();
       setModalOpen(false);
-      toast.success(`Đã ${selectedDonVi ? 'cập nhật' : 'tạo'} đơn vị thành công`);
     } catch (error) {
       console.error('Error saving don vi:', error);
       toast.error('Lỗi khi lưu đơn vị');
@@ -116,15 +106,20 @@ export default function DonViPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Bạn có chắc muốn xóa đơn vị này?')) return;
+  const handleDelete = async (id: string, isHardDelete: boolean = false) => {
+    if (!window.confirm(`Bạn có chắc muốn ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} đơn vị này?`)) return;
     try {
-      await apiFetch(`/donvi/${id}`, { method: 'DELETE' });
+      if (isHardDelete) {
+        await hardDeleteDonVi(id);
+        toast.success('Xóa vĩnh viễn đơn vị thành công');
+      } else {
+        await softDeleteDonVi(id);
+        toast.success('Xóa mềm đơn vị thành công');
+      }
       fetchDonVi();
-      toast.success('Đã xóa đơn vị thành công');
     } catch (error) {
       console.error('Error deleting don vi:', error);
-      toast.error('Lỗi khi xóa đơn vị');
+      toast.error(`Lỗi khi ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} đơn vị`);
     }
   };
 
@@ -137,14 +132,20 @@ export default function DonViPage() {
     { name: 'chucVuNguoiDaiDien', label: 'Chức vụ người đại diện', type: 'text' },
   ];
 
+  // Kiểm tra quyền
+  const canEdit = userRoles === 'TruongDoan' || userRoles === 'ThanhVien'; 
+  const canHardDelete = userRoles === 'TruongDoan'; 
+
   return (
     <Card className="m-1">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Danh sách đơn vị
-          <Button onClick={openCreateModal} variant="secondary">
-            Tạo mới
-          </Button>
+          {canEdit && (
+            <Button onClick={openCreateModal} variant="secondary">
+              Tạo mới
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
 
@@ -204,22 +205,37 @@ export default function DonViPage() {
                         >
                           <Eye className="size-4" />
                         </Button>
-                        <Button
-                          onClick={() => openEditModal(donVi)}
-                          variant="outline"
-                          size="icon"
-                          title="Sửa đơn vị"
-                        >
-                          <Edit className="size-4" />
-                        </Button>
-                        <Button
-                          onClick={() => handleDelete(donVi.id)}
-                          variant="destructive"
-                          size="icon"
-                          title="Xóa đơn vị"
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
+                        {canEdit && (
+                          <Button
+                            onClick={() => openEditModal(donVi)}
+                            variant="outline"
+                            size="icon"
+                            title="Sửa đơn vị"
+                          >
+                            <Edit className="size-4" />
+                          </Button>
+                        )}
+                        {canEdit && (
+                          <Button
+                            onClick={() => handleDelete(donVi.id, false)}
+                            variant="destructive"
+                            size="icon"
+                            title="Xóa mềm đơn vị"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        )}
+                        {canHardDelete && (
+                          <Button
+                            onClick={() => handleDelete(donVi.id, true)}
+                            variant="destructive"
+                            size="icon"
+                            title="Xóa vĩnh viễn đơn vị"
+                            className="bg-red-700 hover:bg-red-800"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -242,7 +258,7 @@ export default function DonViPage() {
             disabled: modalMode === 'view'
           }))}
           apiEndpoint={selectedDonVi ? `/donvi/${selectedDonVi.id}` : '/donvi'}
-          method={selectedDonVi ? 'PUT' : 'POST'}
+          method={modalMode === 'create' ? 'POST' : 'PUT'}
           onSave={modalMode === 'view' ? async () => {} : handleSave}
         />
       </CardContent>
