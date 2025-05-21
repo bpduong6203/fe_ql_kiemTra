@@ -3,14 +3,14 @@ import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
 
 const api = axios.create({
-  baseURL: import.meta.env.API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 const imgApi = axios.create({
-  baseURL: import.meta.env.VITE_IMG_URL || 'http://localhost:3000/cdn',
+  baseURL: import.meta.env.VITE_IMG_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -12,7 +12,12 @@ export interface User {
 export interface LoginResponse {
   message: string;
   token: string;
-  user: User;
+  user: {
+      username: string;
+      hoTen: string;
+      email: string;
+      role: string;
+  };
 }
 
 export interface RegisterResponse {

@@ -8,99 +8,93 @@ import type { LoginResponse, LoginError } from '@/types/auth';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 
-const LoginForm = ({ onSubmit }: { onSubmit?: (email: string, password: string) => void }) => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [rememberMe, setRememberMe] = useState<boolean>(false); 
-  const navigate = useNavigate();
+const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: string) => void }) => {
+    const [username, setUsername] = useState<string>(''); // Đổi từ email thành username
+    const [password, setPassword] = useState<string>('');
+    const [error, setError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError('');
 
-    try {
-      const data = await apiFetch<LoginResponse>('/login', {
-        method: 'POST',
-        data: { email, password },
-      });
+        try {
+            const data = await apiFetch<LoginResponse>('/auth/login', {
+                method: 'POST',
+                data: { Username: username, Password: password }, // Dùng Username, Password theo API
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Gửi rememberMe để server điều chỉnh cookie (tùy chọn)
+                    'X-Remember-Me': rememberMe ? 'true' : 'false',
+                },
+            });
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+            // Lưu thông tin user vào localStorage (không lưu token vì dùng cookie)
+            localStorage.setItem('user', JSON.stringify(data.user));
 
-      if (data.user.roles.includes('admin')) {
-        navigate('/dashboard');
-      } else if (data.user.roles.includes('user')) {
-        navigate('/');
-      } else {
-        setError('Không có vai trò hợp lệ');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
-      }
+            navigate('/');
 
-      if (onSubmit) {
-        onSubmit(email, password);
-      }
-    } catch (err) {
-      setError((err as LoginError).message || 'Đã xảy ra lỗi khi đăng nhập');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+            if (onSubmit) {
+                onSubmit(username, password);
+            }
+        } catch (err) {
+            setError((err as LoginError).message || 'Đã xảy ra lỗi khi đăng nhập');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      {error && <InputError message={error} />}
+    return (
+        <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && <InputError message={error} />}
 
-      <Input
-        id="email"
-        name="email"
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Tài khoản"
-      />
-
-      <Input
-        id="password"
-        name="password"
-        type="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Mật khẩu"
-      />
-
-      {/* Checkbox "Ghi nhớ tôi" và nút "Quên mật khẩu?" */}
-      <div className="mt-6 text-center p-2">
-        <div className="flex justify-between items-center text-sm text-gray-700">
-          <div className="flex items-center">
-            <Checkbox
-              id="remember-me"
-              checked={rememberMe}
-              onCheckedChange={(checked) => setRememberMe(!!checked)}
-              className="mr-2"
+            <Input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Tài khoản"
             />
-            <Label htmlFor="remember-me">Ghi nhớ tôi</Label>
-          </div>
 
-          <Link to="/auth/forgotpassword" className="text-blue-600 hover:underline">
-            Quên mật khẩu?
-          </Link>
-        </div>
-      </div>
+            <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mật khẩu"
+            />
 
+            <div className="mt-6 text-center p-2">
+                <div className="flex justify-between items-center text-sm text-gray-700">
+                    <div className="flex items-center">
+                        <Checkbox
+                            id="remember-me"
+                            checked={rememberMe}
+                            onCheckedChange={(checked) => setRememberMe(!!checked)}
+                            className="mr-2"
+                        />
+                        <Label htmlFor="remember-me">Ghi nhớ tôi</Label>
+                    </div>
 
-      {/* Nút Đăng nhập */}
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-      </Button>
-    </form>
-  );
+                    <Link to="/auth/forgotpassword" className="text-blue-600 hover:underline">
+                        Quên mật khẩu?
+                    </Link>
+                </div>
+            </div>
+
+            <Button type="submit" disabled={isLoading} className="w-full">
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            </Button>
+        </form>
+    );
 };
 
 export default LoginForm;
+
