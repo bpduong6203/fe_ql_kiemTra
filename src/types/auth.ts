@@ -1,13 +1,4 @@
-export interface User {
-  id: string;
-  name: string;
-  avatar: string | null;
-  email: string;
-  email_verified_at: string | null;
-  roles: string[];
-  created_at: string;
-  updated_at: string;
-}
+import type { NguoiDung } from "./interfaces";
 
 export interface LoginResponse {
   message: string;
@@ -23,7 +14,7 @@ export interface LoginResponse {
 export interface RegisterResponse {
   message: string;
   token: string;
-  user: User;
+  user: NguoiDung;
 }
 
 export interface SocialLoginResponse {

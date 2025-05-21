@@ -6,11 +6,12 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChevronsUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { Auth, User } from '@/types';
+import type { NguoiDung } from '@/types/interfaces';
+import type { Auth } from '@/types/index';
 
 export function NavUser() {
     const [auth, setAuth] = useState<Auth>({
-        user: { id: '', name: '', email: '', avatar: null, email_verified_at: null, created_at: '', updated_at: '' },
+        user: { id: '', username: '', hoTen: '', email: '', avatar: null, roleID: '', donViID: '' },
     });
     const { state } = useSidebar();
     const isMobile = useIsMobile();
@@ -19,7 +20,7 @@ export function NavUser() {
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            const userData: User = JSON.parse(storedUser);
+            const userData: NguoiDung = JSON.parse(storedUser);
             setAuth({ user: userData });
         }
     }, [navigate]);

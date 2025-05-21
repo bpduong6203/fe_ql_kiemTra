@@ -29,7 +29,8 @@ export interface NguoiDung {
     soDienThoai?: string;
     diaChi?: string;
     roleID: string;
-    donViID: string;
+    donViID?: string;
+    avatar?: string | null;
     role?: Roles;
     donVi?: DonVi;
 }

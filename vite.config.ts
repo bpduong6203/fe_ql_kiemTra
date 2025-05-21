@@ -5,6 +5,17 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 export default defineConfig({
+  server: {
+    allowedHosts: ['myfe.serveo.net', 'localhost'],
+    proxy: {
+      '/api': {
+        target: 'https://kiemtra.serveo.net',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

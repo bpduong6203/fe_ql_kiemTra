@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { LogOut, Settings, User2 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
-import { type User } from '@/types';
+import { type NguoiDung } from '@/types/interfaces';
 
 interface UserMenuContentProps {
-  user: User;
+  user: NguoiDung;
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
@@ -17,11 +17,10 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
   const handleLogout = async () => {
     try {
-      await apiFetch('/logout', { method: 'POST' });
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      await apiFetch('/auth/logout', { method: 'POST' }); 
+      localStorage.removeItem('user'); 
       cleanup();
-      navigate('/auth/login');
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -59,3 +58,5 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
     </>
   );
 }
+
+

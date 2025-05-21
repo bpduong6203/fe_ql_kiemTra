@@ -24,15 +24,13 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
         try {
             const data = await apiFetch<LoginResponse>('/auth/login', {
                 method: 'POST',
-                data: { Username: username, Password: password }, // Dùng Username, Password theo API
+                data: { Username: username, Password: password },
                 headers: {
                     'Content-Type': 'application/json',
-                    // Gửi rememberMe để server điều chỉnh cookie (tùy chọn)
                     'X-Remember-Me': rememberMe ? 'true' : 'false',
                 },
             });
 
-            // Lưu thông tin user vào localStorage (không lưu token vì dùng cookie)
             localStorage.setItem('user', JSON.stringify(data.user));
 
             navigate('/');

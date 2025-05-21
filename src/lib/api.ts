@@ -1,34 +1,23 @@
-// src/lib/api.ts
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL, 
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, 
 });
 
-const imgApi = axios.create({
-  baseURL: import.meta.env.VITE_IMG_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// API với token
 export async function apiFetch<T = unknown>(
   endpoint: string,
   options: AxiosRequestConfig = {}
 ): Promise<T> {
-  const token = localStorage.getItem('token');
-
   try {
     const response = await api.request<T>({
       url: endpoint,
       ...options,
       headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
       },
     });
@@ -45,7 +34,6 @@ export async function apiFetch<T = unknown>(
   }
 }
 
-// API không cần token
 export async function fetchApiNoToken<T = unknown>(
   endpoint: string,
   options: AxiosRequestConfig = {}
@@ -72,21 +60,21 @@ export async function fetchApiNoToken<T = unknown>(
 }
 
 // Upload file
-export async function uploadFile(file: File): Promise<{ url: string }> {
+export async function uploadFile(file: File): Promise<{ fileName: string; url: string }> {
   const formData = new FormData();
-  formData.append('image', file);
-  const token = localStorage.getItem('token');
-
-  try {
-    const response = await imgApi.post<{ url: string }>('/cdn/upload', formData, {
+  formData.append('file', file);
+ try {
+    const response = await api.post<{ fileName: string; url: string }>('/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<LoginError>;
-    throw new Error(axiosError.response?.data?.message || 'Lỗi khi upload ảnh');
+    throw new Error(axiosError.response?.data?.message || 'Lỗi khi upload file');
   }
 }
+
+
+
