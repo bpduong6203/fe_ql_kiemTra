@@ -106,10 +106,8 @@ export async function hardDeleteDonVi(id: string): Promise<{ message: string }> 
 //============================================================
 
 
-
-
 // Lấy thông tin user để kiểm tra role
-export async function getUserInfo(): Promise<{ username: string; roles: string }> {
+export async function getUserInfo(): Promise<{ username: string; role: string }> {
   return apiFetch('/auth/user', { method: 'GET' });
 }
 

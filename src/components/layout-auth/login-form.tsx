@@ -9,7 +9,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 
 const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: string) => void }) => {
-    const [username, setUsername] = useState<string>(''); // Đổi từ email thành username
+    const [username, setUsername] = useState<string>(''); 
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);

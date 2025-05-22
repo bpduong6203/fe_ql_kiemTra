@@ -22,5 +22,6 @@ export interface SocialLoginResponse {
 }
 
 export interface LoginError {
+  response: any;
   message: string;
 }

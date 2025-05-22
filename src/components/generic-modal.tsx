@@ -118,7 +118,7 @@ const GenericModal = <T extends Record<string, any>>({
             <CardContent className="space-y-4">
               {isLoading ? (
                 <div className="flex justify-center">
-                  <LoadingSpinner variant={3} />
+                  <LoadingSpinner variant={1} />
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-4 justify-between">
