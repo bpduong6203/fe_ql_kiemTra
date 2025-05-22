@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useDonVi } from './DonVi/useDonVi';
+import { useDonVi } from './components/donVi-manager/useDonVi';
 import { SearchBar } from '@/components/SearchBar';
-import { DonViTable } from './DonVi/DonViTable';
-import { DonViModal } from './DonVi/DonViModal';
+import { DonViTable } from './components/donVi-manager/DonViTable';
+import { DonViModal } from './components/donVi-manager/DonViModal';
 import type { DonVi } from '@/types/interfaces';
 
 export default function DonViPage() {

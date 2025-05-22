@@ -58,7 +58,7 @@ const RegisterForm = ({ onSubmit }: { onSubmit?: (email: string, password: strin
       const data = await fetchApiNoToken<RegisterResponse>('/auth/register', {
         method: 'POST',
         data: {
-          Username: username, // Khớp với RegisterModel
+          Username: username,
           Email: email,
           HoTen: hoTen,
           Password: password,

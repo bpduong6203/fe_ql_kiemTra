@@ -1,6 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
-import type { DonVi } from '@/types/interfaces';
+import type { DonVi, NguoiDung, Roles } from '@/types/interfaces';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, 
@@ -77,8 +77,8 @@ export async function uploadFile(file: File): Promise<{ fileName: string; url: s
   }
 }
 
-//================ Don Vi ====================================
 
+// Don Vi APIs
 export async function getDonVis(): Promise<DonVi[]> {
   return apiFetch('/donvi', { method: 'GET' });
 }
@@ -103,12 +103,41 @@ export async function hardDeleteDonVi(id: string): Promise<{ message: string }> 
   return apiFetch(`/donvi/hard/${id}`, { method: 'DELETE' });
 }
 
-//============================================================
-
-
-// Lấy thông tin user để kiểm tra role
-export async function getUserInfo(): Promise<{ username: string; role: string }> {
-  return apiFetch('/auth/user', { method: 'GET' });
+// Roles APIs
+export async function getAllRoles(): Promise<Roles[]> {
+  return apiFetch('/auth/roles', { method: 'GET' });
 }
 
+// User APIs
+export async function getAllUsers(): Promise<NguoiDung[]> {
+  return apiFetch('/auth/users', { method: 'GET' });
+}
 
+export async function createUser(data: Partial<NguoiDung>): Promise<{ message: string; id: string }> {
+  return apiFetch('/auth/users', { method: 'POST', data });
+}
+
+export async function updateUser(id: string, data: Partial<NguoiDung>): Promise<{ message: string }> {
+  return apiFetch(`/auth/users/${id}`, { method: 'PUT', data });
+}
+
+export async function updateUserRole(id: string, roleID: string): Promise<{ message: string }> {
+  return apiFetch(`/auth/users/${id}/role`, { method: 'PATCH', data: { roleID } });
+}
+
+export async function updateUserDonVi(id: string, donViID: string): Promise<{ message: string }> {
+  return apiFetch(`/auth/users/${id}/donvi`, { method: 'PATCH', data: { donViID } });
+}
+
+export async function softDeleteUser(id: string): Promise<{ message: string }> {
+  return apiFetch(`/auth/users/soft/${id}`, { method: 'DELETE' });
+}
+
+export async function hardDeleteUser(id: string): Promise<{ message: string }> {
+  return apiFetch(`/auth/users/hard/${id}`, { method: 'DELETE' });
+}
+
+// Get user info
+export async function getUserInfo(): Promise<{ userId: string; role: string }> {
+  return apiFetch('/auth/user', { method: 'GET' });
+}

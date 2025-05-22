@@ -82,28 +82,33 @@ const GenericModal = <T extends Record<string, any>>({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isLoading) return;
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (isLoading) return;
 
-    setIsLoading(true);
-    setError(null);
+  if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    setError('Email không hợp lệ');
+    return;
+  }
 
-    try {
-      await onSave({ ...formData, file: fileData });
-      setFormData(stableInitialData);
-      setFileData(null);
-      if (previewURL) {
-        URL.revokeObjectURL(previewURL);
-        setPreviewURL(null);
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+  setIsLoading(true);
+  setError(null);
+
+  try {
+    await onSave({ ...formData, file: fileData });
+    setFormData(stableInitialData);
+    setFileData(null);
+    if (previewURL) {
+      URL.revokeObjectURL(previewURL);
+      setPreviewURL(null);
     }
-  };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra';
+    setError(errorMessage);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (!isOpen) return null;
 

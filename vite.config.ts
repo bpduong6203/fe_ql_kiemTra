@@ -3,14 +3,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
+import { env } from 'process';
 
 
 export default defineConfig({
  server: {
-   allowedHosts: ['myfe.serveo.net', 'localhost'],
+   allowedHosts: ['powerpoint-mailto-array-blue.trycloudflare.com', 'localhost'],
    proxy: {
      '/api': {
-       target: 'https://kiemtra.serveo.net',
+       target: env.VITE_API_BASE_URL,
        changeOrigin: true,
        secure: false,
      },
