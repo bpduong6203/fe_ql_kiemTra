@@ -113,6 +113,10 @@ export async function getAllUsers(): Promise<NguoiDung[]> {
   return apiFetch('/auth/users', { method: 'GET' });
 }
 
+export async function getDeletedUsers(): Promise<NguoiDung[]> {
+  return apiFetch('/auth/users/deleted', { method: 'GET' });
+}
+
 export async function createUser(data: Partial<NguoiDung>): Promise<{ message: string; id: string }> {
   return apiFetch('/auth/users', { method: 'POST', data });
 }

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getAllUsers, createUser, updateUser, updateUserRole, updateUserDonVi, softDeleteUser, hardDeleteUser, getAllRoles, getDonVis, getUserInfo } from '@/lib/api';
+import { getDeletedUsers, getAllUsers, createUser, updateUser, updateUserRole, updateUserDonVi, softDeleteUser, hardDeleteUser, getAllRoles, getDonVis, getUserInfo } from '@/lib/api';
 import { toast } from 'react-toastify';
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
 
 export const useUser = () => {
   const [userList, setUserList] = useState<NguoiDung[]>([]);
+  const [deletedUsers, setDeletedUsers] = useState<NguoiDung[]>([]);
   const [filteredUserList, setFilteredUserList] = useState<NguoiDung[]>([]);
   const [rolesList, setRolesList] = useState<Roles[]>([]);
   const [donViList, setDonViList] = useState<DonVi[]>([]);
@@ -49,57 +50,58 @@ export const useUser = () => {
     }
   }, [sortOrder]);
 
-  useEffect(() => {
-    fetchUserInfo();
-    fetchUsers();
-  }, [fetchUserInfo, fetchUsers]);
+  const fetchDeletedUsers = async () => {
+    try {
+      setLoading(true);
+      const deleted = await getDeletedUsers();
+      setDeletedUsers(deleted);
+    } catch (error) {
+      console.error('Error fetching deleted users:', error);
+      toast.error('Lỗi khi tải danh sách tài khoản đã xóa');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    const filtered = userList.filter(
-      (user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.hoTen?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredUserList(filtered);
-  }, [searchQuery, userList]);
-
-  const toggleSortOrder = () => {
-    const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-    setSortOrder(newSortOrder);
-    setFilteredUserList([...filteredUserList].sort((a, b) =>
-      newSortOrder === 'asc' ? a.username.localeCompare(b.username) : b.username.localeCompare(a.username)
-    ));
+  const handlePermanentDelete = async (id: string) => {
+    try {
+      await hardDeleteUser(id);
+      toast.success('Xóa vĩnh viễn tài khoản thành công');
+      await fetchDeletedUsers();
+    } catch (error) {
+      console.error('Error permanently deleting user:', error);
+      toast.error('Lỗi khi xóa vĩnh viễn tài khoản');
+    }
   };
 
   const handleSave = async (data: any, mode: 'create' | 'edit', id?: string) => {
-      try {
-          if (mode === 'create' || (data.password && data.password.trim())) {
-              if (!data.password && mode === 'create') {
-                  throw new Error('Vui lòng nhập mật khẩu');
-              }
-              if (data.password !== data.confirmPassword) {
-                  throw new Error('Mật khẩu và xác nhận mật khẩu không khớp');
-              }
-          }
-
-          const { confirmPassword, ...payload } = data;
-          if (mode === 'create') {
-              await createUser(payload);
-              toast.success('Tạo người dùng thành công');
-          } else {
-              await updateUser(id!, payload);
-              toast.success('Cập nhật người dùng thành công');
-          }
-          fetchUsers();
-      } catch (error) {
-          console.error('Error saving user:', error);
-          toast.error(error instanceof Error ? error.message : 'Lỗi khi lưu người dùng');
-          throw error;
+    try {
+      if (mode === 'create' || (data.password && data.password.trim())) {
+        if (!data.password && mode === 'create') {
+          throw new Error('Vui lòng nhập mật khẩu');
+        }
+        if (data.password !== data.confirmPassword) {
+          throw new Error('Mật khẩu và xác nhận mật khẩu không khớp');
+        }
       }
+
+      const { confirmPassword, ...payload } = data;
+      if (mode === 'create') {
+        await createUser(payload);
+        toast.success('Tạo người dùng thành công');
+      } else {
+        await updateUser(id!, payload);
+        toast.success('Cập nhật người dùng thành công');
+      }
+      fetchUsers();
+    } catch (error) {
+      console.error('Error saving user:', error);
+      toast.error(error instanceof Error ? error.message : 'Lỗi khi lưu người dùng');
+      throw error;
+    }
   };
 
   const handleDelete = async (id: string, isHardDelete: boolean = false) => {
-    if (!window.confirm(`Bạn có chắc muốn ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} người dùng này?`)) return;
     try {
       if (isHardDelete) {
         await hardDeleteUser(id);
@@ -137,10 +139,35 @@ export const useUser = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUserInfo();
+    fetchUsers();
+  }, [fetchUserInfo, fetchUsers]);
+
+  useEffect(() => {
+    const filtered = userList.filter(
+      (user) =>
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.hoTen?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredUserList(filtered);
+  }, [searchQuery, userList]);
+
+  const toggleSortOrder = () => {
+    const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortOrder(newSortOrder);
+    setFilteredUserList([...filteredUserList].sort((a, b) =>
+      newSortOrder === 'asc' ? a.username.localeCompare(b.username) : b.username.localeCompare(a.username)
+    ));
+  };
+
   const canEdit = userRole === 'TruongDoan' || userRole === 'ThanhVien';
   const canHardDelete = userRole === 'TruongDoan';
 
   return {
+    handlePermanentDelete,
+    deletedUsers,
+    fetchDeletedUsers,
     userList,
     filteredUserList,
     rolesList,
