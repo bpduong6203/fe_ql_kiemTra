@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/SearchBar';
-import { useUser } from './components/user-manager/useUser';
+import { useUser } from './hooks/useUser';
 import { UserTable } from './components/user-manager/UserTable';
 import { UserModal } from './components/user-manager/UserModal';
 import { UserViewModal } from './components/user-manager/UserViewModal';
@@ -20,8 +20,6 @@ export default function UserManager() {
     sortOrder,
     searchQuery,
     setSearchQuery,
-    userRole,
-    fetchUsers,
     fetchDeletedUsers,
     toggleSortOrder,
     handleSave,

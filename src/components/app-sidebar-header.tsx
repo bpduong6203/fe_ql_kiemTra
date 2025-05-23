@@ -2,9 +2,9 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { type BreadcrumbItem as BreadcrumbItemType, type NavItem } from '@/types';
-import DarkModeToggle from './dark-mode-toggle';
 import { Bell, ShoppingBag } from 'lucide-react';
 import PlanManager from './plan-manager';
+import AppearanceToggleTab from './appearance-tabs';
 
 const rightNavItems: NavItem[] = [
     {
@@ -29,7 +29,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
         </div>
         <div className="flex items-center space-x-2">
             <div className="relative flex items-center space-x-1">
-                <DarkModeToggle />
+                <AppearanceToggleTab />
                 <div className="hidden lg:flex">
                     {rightNavItems.map((item) => (
                         <TooltipProvider key={item.title} delayDuration={0}>

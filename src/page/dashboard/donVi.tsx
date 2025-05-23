@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useDonVi } from './components/donVi-manager/useDonVi';
+import { useDonVi } from './hooks/useDonVi';
 import { SearchBar } from '@/components/SearchBar';
 import { DonViTable } from './components/donVi-manager/DonViTable';
 import { DonViModal } from './components/donVi-manager/DonViModal';
@@ -17,8 +17,6 @@ export default function DonViPage() {
     sortOrder,
     searchQuery,
     setSearchQuery,
-    userRole,
-    fetchDonVi,
     fetchDeletedDonVis,
     toggleSortOrder,
     handleSave,
