@@ -7,6 +7,8 @@ export interface Field {
     required?: boolean;
     inline?: boolean;
     options?: { value: string; label: string }[];
+    readOnly?: boolean | undefined;
+    disabled?: boolean;
 }
 
 export interface DonVi {

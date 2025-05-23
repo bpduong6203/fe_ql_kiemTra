@@ -11,6 +11,7 @@ import type { NguoiDung } from '@/types/interfaces';
 
 export default function UserManager() {
   const {
+    handleRestore,
     filteredUserList,
     deletedUsers,
     rolesList,
@@ -67,7 +68,7 @@ export default function UserManager() {
           Danh sách người dùng
           <div className="flex gap-2">
             {canHardDelete && (
-              <Button onClick={openTrashModal} variant="outline">
+              <Button onClick={openTrashModal} variant="destructive">
                 Thùng rác
               </Button>
             )}
@@ -128,6 +129,7 @@ export default function UserManager() {
           onClose={() => setTrashModalOpen(false)}
           deletedUsers={deletedUsers}
           onPermanentDelete={handlePermanentDelete}
+          onRestore={handleRestore}
         />
       </CardContent>
     </Card>

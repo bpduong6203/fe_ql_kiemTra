@@ -5,44 +5,61 @@ import { useDonVi } from './components/donVi-manager/useDonVi';
 import { SearchBar } from '@/components/SearchBar';
 import { DonViTable } from './components/donVi-manager/DonViTable';
 import { DonViModal } from './components/donVi-manager/DonViModal';
+import { DonViViewModal } from './components/donVi-manager/DonViViewModal';
+import { DeletedDonVisModal } from './components/donVi-manager/DeletedDonVisModal';
 import type { DonVi } from '@/types/interfaces';
 
 export default function DonViPage() {
   const {
     filteredDonViList,
+    deletedDonViList,
     loading,
     sortOrder,
     searchQuery,
     setSearchQuery,
     userRole,
-    fetchDonVi, 
+    fetchDonVi,
+    fetchDeletedDonVis,
     toggleSortOrder,
     handleSave,
     handleDelete,
+    handlePermanentDelete,
+    handleRestore,
     canEdit,
     canHardDelete,
   } = useDonVi();
 
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [trashModalOpen, setTrashModalOpen] = useState(false);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
   const [selectedDonVi, setSelectedDonVi] = useState<DonVi | null>(null);
 
   const openCreateModal = () => {
+    setMode('create');
     setSelectedDonVi(null);
-    setModalMode('create');
     setModalOpen(true);
   };
 
   const openEditModal = (donVi: DonVi) => {
+    setMode('edit');
     setSelectedDonVi(donVi);
-    setModalMode('edit');
     setModalOpen(true);
   };
 
   const openViewModal = (donVi: DonVi) => {
     setSelectedDonVi(donVi);
-    setModalMode('view');
-    setModalOpen(true);
+    setViewModalOpen(true);
+  };
+
+  const openTrashModal = () => {
+    fetchDeletedDonVis();
+    setTrashModalOpen(true);
+  };
+
+  const handleSaveDonVi = async (data: any) => {
+    await handleSave(data, mode, selectedDonVi?.id);
+    setModalOpen(false);
   };
 
   return (
@@ -50,11 +67,18 @@ export default function DonViPage() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Danh sách đơn vị
-          {canEdit && (
-            <Button onClick={openCreateModal} variant="secondary">
-              Tạo mới
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {canHardDelete && (
+              <Button onClick={openTrashModal} variant="destructive">
+                Thùng rác
+              </Button>
+            )}
+            {canEdit && (
+              <Button onClick={openCreateModal} variant="secondary">
+                Tạo mới
+              </Button>
+            )}
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -73,13 +97,21 @@ export default function DonViPage() {
         <DonViModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          mode={modalMode}
+          mode={mode}
           selectedDonVi={selectedDonVi}
-          onSave={async (data) => {
-            if (modalMode === 'create' || modalMode === 'edit') {
-              await handleSave(data, modalMode, selectedDonVi?.id);
-            }
-          }}
+          onSave={handleSaveDonVi}
+        />
+        <DonViViewModal
+          isOpen={viewModalOpen}
+          onClose={() => setViewModalOpen(false)}
+          selectedDonVi={selectedDonVi}
+        />
+        <DeletedDonVisModal
+          isOpen={trashModalOpen}
+          onClose={() => setTrashModalOpen(false)}
+          deletedDonVis={deletedDonViList}
+          onPermanentDelete={handlePermanentDelete}
+          onRestore={handleRestore}
         />
       </CardContent>
     </Card>

@@ -8,7 +8,7 @@ import { env } from 'process';
 
 export default defineConfig({
  server: {
-   allowedHosts: ['powerpoint-mailto-array-blue.trycloudflare.com', 'localhost'],
+   allowedHosts: ['ban-discusses-array-doctrine.trycloudflare.com', 'localhost'],
    proxy: {
      '/api': {
        target: env.VITE_API_BASE_URL,

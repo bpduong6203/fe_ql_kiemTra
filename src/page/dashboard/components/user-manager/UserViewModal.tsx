@@ -1,6 +1,10 @@
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
 
@@ -35,12 +39,12 @@ export const UserViewModal: React.FC<UserViewModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 bg-[rgba(94,94,94,0.5)] flex items-center justify-center z-50">
-      <Card className="w-full max-w-[600px]">
-        <CardHeader>
-          <CardTitle>Xem người dùng</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] p-6">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold">Xem người dùng</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
           <div className="grid gap-4">
             {fields.map((field) => (
               <div key={field.label} className="grid grid-cols-3 gap-2">
@@ -49,13 +53,8 @@ export const UserViewModal: React.FC<UserViewModalProps> = ({
               </div>
             ))}
           </div>
-        </CardContent>
-        <CardFooter className="justify-end">
-          <Button type="button" variant="destructive" onClick={onClose}>
-            Đóng
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

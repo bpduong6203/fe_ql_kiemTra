@@ -5,7 +5,7 @@ import type { DonVi } from '@/types/interfaces';
 interface DonViModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mode: 'view' | 'edit' | 'create';
+  mode: 'edit' | 'create';
   selectedDonVi: DonVi | null;
   onSave: (data: any) => Promise<void>;
 }
@@ -15,18 +15,12 @@ export const DonViModal: React.FC<DonViModalProps> = ({ isOpen, onClose, mode, s
     <GenericModal
       isOpen={isOpen}
       onClose={onClose}
-      title={
-        mode === 'view' ? 'Xem đơn vị' :
-        mode === 'edit' ? 'Sửa đơn vị' : 'Tạo đơn vị mới'
-      }
+      title={mode === 'edit' ? 'Sửa đơn vị' : 'Tạo đơn vị mới'}
       initialData={selectedDonVi || {}}
-      fields={donViFields.map(field => ({
-        ...field,
-        disabled: mode === 'view'
-      }))}
+      fields={donViFields}
       apiEndpoint={selectedDonVi ? `/donvi/${selectedDonVi.id}` : '/donvi'}
       method={mode === 'create' ? 'POST' : 'PUT'}
-      onSave={mode === 'view' ? async () => {} : onSave}
+      onSave={onSave}
     />
   );
 };

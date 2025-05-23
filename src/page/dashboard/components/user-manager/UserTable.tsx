@@ -14,6 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import LoadingSpinner from '@/components/loading-spinner';
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
 
 interface UserTableProps {
@@ -46,9 +47,31 @@ export const UserTable: React.FC<UserTableProps> = ({
   onRoleChange,
   onDonViChange,
 }) => {
+  // Trạng thái loading chung cho hành động thay đổi vai trò hoặc đơn vị
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isHardDelete, setIsHardDelete] = useState<boolean>(false);
+
+  // Hàm xử lý thay đổi vai trò với loading
+  const handleRoleChange = async (userId: string, roleID: string) => {
+    setIsLoading(true);
+    try {
+      await onRoleChange(userId, roleID);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Hàm xử lý thay đổi đơn vị với loading
+  const handleDonViChange = async (userId: string, donViID: string) => {
+    setIsLoading(true);
+    try {
+      await onDonViChange(userId, donViID);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDeleteClick = (id: string, hardDelete: boolean) => {
     setSelectedUserId(id);
@@ -77,6 +100,25 @@ export const UserTable: React.FC<UserTableProps> = ({
 
   return (
     <>
+      {isLoading && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <LoadingSpinner variant={1} />
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-sm">
         <table className="min-w-full border rounded-2xl shadow">
           <thead>
@@ -107,7 +149,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                   <td className="px-4 py-2">{user.hoTen || 'N/A'}</td>
                   <td className="px-4 py-2">
                     {canEdit ? (
-                      <Select value={user.roleID} onValueChange={(value) => onRoleChange(user.id, value)}>
+                      <Select
+                        value={user.roleID}
+                        onValueChange={(value) => handleRoleChange(user.id, value)}
+                        disabled={isLoading} 
+                      >
                         <SelectTrigger className="w-[150px]">
                           <SelectValue placeholder="Chọn vai trò" />
                         </SelectTrigger>
@@ -125,7 +171,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                   </td>
                   <td className="px-4 py-2">
                     {canEdit ? (
-                      <Select value={user.donViID} onValueChange={(value) => onDonViChange(user.id, value)}>
+                      <Select
+                        value={user.donViID}
+                        onValueChange={(value) => handleDonViChange(user.id, value)}
+                        disabled={isLoading} 
+                      >
                         <SelectTrigger className="w-[150px]">
                           <SelectValue placeholder="Chọn đơn vị" />
                         </SelectTrigger>
@@ -171,7 +221,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                             <Trash2 className="size-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Xóa mềm người dùng</TooltipContent>
+                        <TooltipContent>Xóa người dùng</TooltipContent>
                       </Tooltip>
                     )}
                   </td>
@@ -189,16 +239,16 @@ export const UserTable: React.FC<UserTableProps> = ({
               Xác nhận xóa
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-muted-foreground">
-                Bạn có chắc chắn muốn xóa người dùng này? Tài khoản sẽ được chuyển vào thùng rác và có thể khôi phục sau.
+              Bạn có chắc chắn muốn xóa người dùng này? Tài khoản sẽ được chuyển vào thùng rác và có thể khôi phục sau.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="px-4 py-2">Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className='bg-red-700 hover:bg-red-800'
+              className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
             >
-               Xóa
+              Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

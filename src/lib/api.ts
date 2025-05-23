@@ -77,68 +77,9 @@ export async function uploadFile(file: File): Promise<{ fileName: string; url: s
   }
 }
 
-
-// Don Vi APIs
-export async function getDonVis(): Promise<DonVi[]> {
-  return apiFetch('/donvi', { method: 'GET' });
-}
-
-export async function getDonVi(id: string): Promise<DonVi> {
-  return apiFetch(`/donvi/${id}`, { method: 'GET' });
-}
-
-export async function createDonVi(data: Partial<DonVi>): Promise<DonVi> {
-  return apiFetch('/donvi', { method: 'POST', data });
-}
-
-export async function updateDonVi(id: string, data: Partial<DonVi>): Promise<DonVi> {
-  return apiFetch(`/donvi/${id}`, { method: 'PUT', data });
-}
-
-export async function softDeleteDonVi(id: string): Promise<{ message: string }> {
-  return apiFetch(`/donvi/soft/${id}`, { method: 'DELETE' });
-}
-
-export async function hardDeleteDonVi(id: string): Promise<{ message: string }> {
-  return apiFetch(`/donvi/hard/${id}`, { method: 'DELETE' });
-}
-
 // Roles APIs
 export async function getAllRoles(): Promise<Roles[]> {
   return apiFetch('/auth/roles', { method: 'GET' });
-}
-
-// User APIs
-export async function getAllUsers(): Promise<NguoiDung[]> {
-  return apiFetch('/auth/users', { method: 'GET' });
-}
-
-export async function getDeletedUsers(): Promise<NguoiDung[]> {
-  return apiFetch('/auth/users/deleted', { method: 'GET' });
-}
-
-export async function createUser(data: Partial<NguoiDung>): Promise<{ message: string; id: string }> {
-  return apiFetch('/auth/users', { method: 'POST', data });
-}
-
-export async function updateUser(id: string, data: Partial<NguoiDung>): Promise<{ message: string }> {
-  return apiFetch(`/auth/users/${id}`, { method: 'PUT', data });
-}
-
-export async function updateUserRole(id: string, roleID: string): Promise<{ message: string }> {
-  return apiFetch(`/auth/users/${id}/role`, { method: 'PATCH', data: { roleID } });
-}
-
-export async function updateUserDonVi(id: string, donViID: string): Promise<{ message: string }> {
-  return apiFetch(`/auth/users/${id}/donvi`, { method: 'PATCH', data: { donViID } });
-}
-
-export async function softDeleteUser(id: string): Promise<{ message: string }> {
-  return apiFetch(`/auth/users/soft/${id}`, { method: 'DELETE' });
-}
-
-export async function hardDeleteUser(id: string): Promise<{ message: string }> {
-  return apiFetch(`/auth/users/hard/${id}`, { method: 'DELETE' });
 }
 
 // Get user info

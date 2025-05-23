@@ -4,7 +4,7 @@ export const userFields: Field[] = [
   { name: 'username', label: 'Tên đăng nhập', type: 'text', required: true },
   { name: 'password', label: 'Mật khẩu', type: 'password', required: true, inline: true},
   { name: 'confirmPassword', label: 'Xác nhận mật khẩu', type: 'password', required: true , inline: true},
-  { name: 'hoTen', label: 'Họ tên', type: 'text' },
+  { name: 'hoTen', label: 'Họ tên', type: 'text', required: true },
   { name: 'email', label: 'Email', type: 'email', inline: true, required: true },
   { name: 'soDienThoai', label: 'Số điện thoại', type: 'text', inline: true },
   { name: 'diaChi', label: 'Địa chỉ', type: 'text' },

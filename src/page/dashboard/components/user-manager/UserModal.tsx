@@ -53,12 +53,14 @@ export const UserModal: React.FC<UserModalProps> = ({
         ...field,
         required: field.name === 'password' || field.name === 'confirmPassword' ? mode === 'create' : field.required,
         disabled: field.name === 'username' && mode === 'edit',
+        readOnly: field.name === 'username' && mode === 'edit', 
         placeholder:
           field.name === 'password' && mode === 'edit'
             ? 'Nhập mật khẩu mới'
             : field.name === 'confirmPassword' && mode === 'edit'
             ? 'Xác nhận mật khẩu mới'
             : field.placeholder,
+        className: field.name === 'username' && mode === 'edit' ? 'bg-gray-100 cursor-not-allowed' : undefined, 
       }))}
       apiEndpoint={selectedUser ? `/users/${selectedUser.id}` : '/users'}
       method={mode === 'create' ? 'POST' : 'PUT'}

@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getDeletedUsers, getAllUsers, createUser, updateUser, updateUserRole, updateUserDonVi, softDeleteUser, hardDeleteUser, getAllRoles, getDonVis, getUserInfo } from '@/lib/api';
+import { restoreUser, getDeletedUsers, getAllUsers, createUser, updateUser, updateUserRole, updateUserDonVi, softDeleteUser, hardDeleteUser } from '@/lib/apiuser';
 import { toast } from 'react-toastify';
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
+import { getAllRoles, getUserInfo } from '@/lib/api';
+import { getDonVis } from '@/lib/apidonvi';
 
 export const useUser = () => {
   const [userList, setUserList] = useState<NguoiDung[]>([]);
@@ -161,10 +163,22 @@ export const useUser = () => {
     ));
   };
 
+    const handleRestore = async (id: string) => {
+    try {
+      await restoreUser(id);
+      toast.success('Khôi phục tài khoản thành công');
+      await fetchDeletedUsers();
+    } catch (error) {
+      console.error('Error restoring user:', error);
+      toast.error('Lỗi khi khôi phục tài khoản');
+    }
+  };
+
   const canEdit = userRole === 'TruongDoan' || userRole === 'ThanhVien';
   const canHardDelete = userRole === 'TruongDoan';
 
   return {
+    handleRestore,
     handlePermanentDelete,
     deletedUsers,
     fetchDeletedUsers,
