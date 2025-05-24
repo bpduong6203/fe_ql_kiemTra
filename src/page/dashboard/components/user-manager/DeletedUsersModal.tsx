@@ -140,7 +140,7 @@ export const DeletedUsersModal: React.FC<DeletedUsersModalProps> = ({
               className={
                 actionType === 'delete'
                   ? 'bg-destructive text-white hover:bg-destructive/90'
-                  : 'bg-primary text-white hover:bg-primary/90'
+                  : 'bg-primary hover:bg-primary/90'
               }
             >
               {actionType === 'delete' ? 'Xóa vĩnh viễn' : 'Khôi phục'}

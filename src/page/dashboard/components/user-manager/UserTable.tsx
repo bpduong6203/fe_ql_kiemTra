@@ -101,22 +101,7 @@ export const UserTable: React.FC<UserTableProps> = ({
   return (
     <>
       {isLoading && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.2)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <LoadingSpinner variant={2} />
-        </div>
+        <LoadingSpinner variant={2} />
       )}
 
       <div className="overflow-x-auto rounded-sm">

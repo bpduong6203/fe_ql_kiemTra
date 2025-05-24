@@ -6,6 +6,7 @@ import InputError from '@/components/input-error';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { fetchApiNoToken } from '@/lib/api';
 import type { RegisterResponse, LoginError } from '@/types/auth';
+import LoadingSpinner from '../loading-spinner';
 
 interface FormErrors {
   username?: string;
@@ -163,9 +164,15 @@ const RegisterForm = ({ onSubmit }: { onSubmit?: (email: string, password: strin
         />
         {errors.password && <InputError message={errors.password} />}
       </div>
-
       <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
+        {isLoading ? (
+          <>
+            <LoadingSpinner variant={2}/>
+            <span>Đang xử lý</span>
+          </>
+        ) : (
+          'Đăng ký'
+        )}
       </Button>
     </form>
   );

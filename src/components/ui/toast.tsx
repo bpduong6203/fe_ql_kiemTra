@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as Toast from '@radix-ui/react-toast';
-import { cn } from '@/lib/utils'; 
+import { cn } from '@/lib/utils';
 
 interface CustomToastProps {
   message: string;
@@ -21,16 +21,25 @@ const CustomToast: React.FC<CustomToastProps> = ({
     <Toast.Provider swipeDirection="right">
       <Toast.Root
         className={cn(
-          'p-4 rounded-md shadow-lg text-white flex items-center justify-between',
+          'p-4 rounded-md shadow-lg flex items-center justify-between border',
           'animate-slide-in data-[state=closed]:animate-slide-out',
-          type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          type === 'success'
+            ? 'bg-emerald-500 text-white border-gray-200 dark:bg-emerald-700 dark:text-gray-100 dark:border-gray-700'
+            : 'bg-rose-500 text-white border-gray-200 dark:bg-rose-700 dark:text-gray-100 dark:border-gray-700'
         )}
         open={open}
         onOpenChange={onOpenChange}
         duration={duration}
       >
         <Toast.Description>{message}</Toast.Description>
-        <Toast.Close className="ml-4 text-white hover:text-gray-200">
+        <Toast.Close
+          className={cn(
+            'ml-4',
+            type === 'success'
+              ? 'text-white hover:text-gray-200 dark:text-gray-100 dark:hover:text-gray-300'
+              : 'text-white hover:text-gray-200 dark:text-gray-100 dark:hover:text-gray-300'
+          )}
+        >
           ✕
         </Toast.Close>
       </Toast.Root>

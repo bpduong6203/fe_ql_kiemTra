@@ -114,7 +114,6 @@ const GenericModal = <T extends Record<string, any>>({
       }
     }
 
-    // Kiểm tra xác nhận mật khẩu
     if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
       setError("Mật khẩu và xác nhận mật khẩu không khớp");
       return;
@@ -131,7 +130,7 @@ const GenericModal = <T extends Record<string, any>>({
         URL.revokeObjectURL(previewURL);
         setPreviewURL(null);
       }
-      onClose(); // Đóng modal khi lưu thành công
+      onClose();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra";
       setError(errorMessage);
@@ -143,22 +142,7 @@ const GenericModal = <T extends Record<string, any>>({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.3)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
           <LoadingSpinner variant={2} />
-        </div>
       )}
       <DialogContent className="sm:max-w-md p-6">
         <DialogHeader>

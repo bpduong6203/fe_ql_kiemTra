@@ -3,6 +3,7 @@ import { getKeHoachs, getDeletedKeHoachs, createKeHoach, updateKeHoach, softDele
 import { getDonVis } from '@/lib/apidonvi';
 import { getUserInfo } from '@/lib/api';
 import type { KeHoach, DonVi } from '@/types/interfaces';
+import { useToast } from '@/components/toast-provider';
 
 interface FileWithType {
   file: File;
@@ -18,6 +19,7 @@ export const useKeHoach = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   // Lấy thông tin user để kiểm tra role
   const fetchUserInfo = useCallback(async () => {
@@ -102,8 +104,10 @@ export const useKeHoach = () => {
       let result: KeHoach;
       if (mode === 'create') {
         result = await createKeHoach(payload);
+        addToast('Thêm đơn vị thành công!', 'success');
       } else {
         result = await updateKeHoach(id!, payload);
+        addToast('Cập nhật đơn vị thành công!', 'success');
       }
       fetchKeHoachs();
       return result;
@@ -133,6 +137,7 @@ export const useKeHoach = () => {
     try {
       await hardDeleteKeHoach(id);
       fetchDeletedKeHoachs();
+      addToast('Xóa thành công!', 'success');
     } catch (error) {
       console.error('Error permanently deleting kế hoạch:', error);
     }
@@ -144,6 +149,7 @@ export const useKeHoach = () => {
       await restoreKeHoach(id);
       fetchDeletedKeHoachs();
       fetchKeHoachs();
+      addToast('Khôi phục thành công!', 'success');
     } catch (error) {
       console.error('Error restoring kế hoạch:', error);
     }

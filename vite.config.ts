@@ -8,7 +8,7 @@ import { env } from 'process';
 
 export default defineConfig({
  server: {
-   allowedHosts: ['marketing-spiritual-victor-organizational.trycloudflare.com', 'localhost'],
+   allowedHosts: ['tend-gratuit-may-controller.trycloudflare.com', 'localhost'],
    proxy: {
      '/api': {
        target: env.VITE_API_BASE_URL,

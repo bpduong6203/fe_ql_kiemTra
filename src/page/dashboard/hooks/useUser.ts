@@ -3,6 +3,7 @@ import { restoreUser, getDeletedUsers, getAllUsers, createUser, updateUser, upda
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
 import { getAllRoles, getUserInfo } from '@/lib/api';
 import { getDonVis } from '@/lib/apidonvi';
+import { useToast } from '@/components/toast-provider';
 
 export const useUser = () => {
   const [userList, setUserList] = useState<NguoiDung[]>([]);
@@ -14,6 +15,7 @@ export const useUser = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   const fetchUserInfo = useCallback(async () => {
     console.log('fetchUserInfo called');
@@ -84,8 +86,10 @@ export const useUser = () => {
       const { confirmPassword, ...payload } = data;
       if (mode === 'create') {
         await createUser(payload);
+        addToast('Thêm người dùng thành công!', 'success');
       } else {
         await updateUser(id!, payload);
+        addToast('Cập nhật thông tin người dùng thành công', 'success');
       }
       fetchUsers();
     } catch (error) {
@@ -98,8 +102,10 @@ export const useUser = () => {
     try {
       if (isHardDelete) {
         await hardDeleteUser(id);
+        addToast('Xóa nguòi dùng thành công!', 'success');
       } else {
         await softDeleteUser(id);
+        addToast('Xóa người dùng thành công!', 'success');
       }
       fetchUsers();
     } catch (error) {
@@ -111,6 +117,7 @@ export const useUser = () => {
     try {
       await updateUserRole(userId, roleID);
       fetchUsers();
+      addToast('Cập nhật vai trò thành công!', 'success');
     } catch (error) {
       console.error('Error updating role:', error);
     }
@@ -120,6 +127,7 @@ export const useUser = () => {
     try {
       await updateUserDonVi(userId, donViID);
       fetchUsers();
+      addToast('Cập nhật đơn vị thành công', 'success');
     } catch (error) {
       console.error('Error updating don vi:', error);
     }
@@ -151,6 +159,8 @@ export const useUser = () => {
     try {
       await restoreUser(id);
       await fetchDeletedUsers();
+      await fetchUsers();
+      addToast('Khôi phục thành công!', 'success');
     } catch (error) {
       console.error('Error restoring user:', error);
     }
