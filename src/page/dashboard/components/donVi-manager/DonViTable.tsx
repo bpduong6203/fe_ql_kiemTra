@@ -34,7 +34,6 @@ export const DonViTable: React.FC<DonViTableProps> = ({
   sortOrder,
   toggleSortOrder,
   canEdit,
-  canHardDelete,
   onView,
   onEdit,
   onDelete,

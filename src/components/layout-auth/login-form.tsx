@@ -70,7 +70,7 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
             />
 
             <div className="mt-6 text-center p-2">
-                <div className="flex justify-between items-center text-sm text-gray-700">
+                <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center">
                         <Checkbox
                             id="remember-me"
@@ -81,7 +81,7 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
                         <Label htmlFor="remember-me">Ghi nhớ tôi</Label>
                     </div>
 
-                    <Link to="/auth/forgotpassword" className="text-blue-600 hover:underline">
+                    <Link to="/auth/forgotpassword" className="text-blue-600 dark:text-blue-500 hover:underline">
                         Quên mật khẩu?
                     </Link>
                 </div>

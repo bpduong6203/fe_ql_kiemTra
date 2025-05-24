@@ -1,8 +1,9 @@
-import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import * as React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface Unit {
   id: string;
@@ -10,13 +11,14 @@ interface Unit {
 }
 
 interface UnitSelectionProps {
-  units: Unit[]; 
-  loading: boolean; 
+  units: Unit[];
+  loading: boolean;
   selectedUnit: string | null;
   setSelectedUnit: React.Dispatch<React.SetStateAction<string | null>>;
+  error?: string | null; // Thêm prop error
 }
 
-const UnitSelection: React.FC<UnitSelectionProps> = ({ units, loading, selectedUnit, setSelectedUnit }) => {
+const UnitSelection: React.FC<UnitSelectionProps> = ({ units, loading, selectedUnit, setSelectedUnit, error }) => {
   const handleUnitChange = (unitId: string) => {
     setSelectedUnit((prev) => (prev === unitId ? null : unitId));
   };
@@ -27,6 +29,12 @@ const UnitSelection: React.FC<UnitSelectionProps> = ({ units, loading, selectedU
         <CardTitle>Chọn Đơn Vị</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTitle>Lỗi</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         {loading ? (
           <div className="space-y-2">
             <Skeleton className="h-6 w-full" />

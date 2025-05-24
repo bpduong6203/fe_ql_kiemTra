@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "react-toastify";
 import { PlusIcon, SearchIcon } from "lucide-react";
 import GenericModal from "@/components/generic-modal";
 
@@ -46,14 +45,13 @@ const PlanManager: React.FC = () => {
   // Xử lý chọn kế hoạch
   const handleSelectPlan = (plan: Plan) => {
     setSelectedPlan(plan);
-    setOpen(false); // Đóng modal sau khi chọn
-    toast.success(`Đã chọn kế hoạch: ${plan.name}`);
+    setOpen(false); 
   };
 
   // Không cần hàm onSave vì không lưu dữ liệu form
   const handleClose = () => {
     setOpen(false);
-    setSearchQuery(""); // Reset tìm kiếm khi đóng
+    setSearchQuery("");
   };
 
   return (

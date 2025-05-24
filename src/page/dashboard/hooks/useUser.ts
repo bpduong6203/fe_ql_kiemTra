@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { restoreUser, getDeletedUsers, getAllUsers, createUser, updateUser, updateUserRole, updateUserDonVi, softDeleteUser, hardDeleteUser } from '@/lib/apiuser';
-import { toast } from 'react-toastify';
 import type { NguoiDung, Roles, DonVi } from '@/types/interfaces';
 import { getAllRoles, getUserInfo } from '@/lib/api';
 import { getDonVis } from '@/lib/apidonvi';
@@ -24,7 +23,6 @@ export const useUser = () => {
       console.log('Role from API:', userInfo.role);
     } catch (error) {
       console.error('Error fetching user info:', error);
-      toast.error('Lỗi khi lấy thông tin người dùng');
     }
   }, []);
 
@@ -46,7 +44,6 @@ export const useUser = () => {
       setDonViList(donVis);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Lỗi khi tải dữ liệu người dùng');
     } finally {
       setLoading(false);
     }
@@ -59,7 +56,6 @@ export const useUser = () => {
       setDeletedUsers(deleted);
     } catch (error) {
       console.error('Error fetching deleted users:', error);
-      toast.error('Lỗi khi tải danh sách tài khoản đã xóa');
     } finally {
       setLoading(false);
     }
@@ -68,11 +64,9 @@ export const useUser = () => {
   const handlePermanentDelete = async (id: string) => {
     try {
       await hardDeleteUser(id);
-      toast.success('Xóa vĩnh viễn tài khoản thành công');
       await fetchDeletedUsers();
     } catch (error) {
       console.error('Error permanently deleting user:', error);
-      toast.error('Lỗi khi xóa vĩnh viễn tài khoản');
     }
   };
 
@@ -90,15 +84,12 @@ export const useUser = () => {
       const { confirmPassword, ...payload } = data;
       if (mode === 'create') {
         await createUser(payload);
-        toast.success('Tạo người dùng thành công');
       } else {
         await updateUser(id!, payload);
-        toast.success('Cập nhật người dùng thành công');
       }
       fetchUsers();
     } catch (error) {
       console.error('Error saving user:', error);
-      toast.error(error instanceof Error ? error.message : 'Lỗi khi lưu người dùng');
       throw error;
     }
   };
@@ -107,37 +98,30 @@ export const useUser = () => {
     try {
       if (isHardDelete) {
         await hardDeleteUser(id);
-        toast.success('Xóa vĩnh viễn người dùng thành công');
       } else {
         await softDeleteUser(id);
-        toast.success('Xóa mềm người dùng thành công');
       }
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
-      toast.error(`Lỗi khi ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} người dùng`);
     }
   };
 
   const handleRoleChange = async (userId: string, roleID: string) => {
     try {
       await updateUserRole(userId, roleID);
-      toast.success('Cập nhật vai trò thành công');
       fetchUsers();
     } catch (error) {
       console.error('Error updating role:', error);
-      toast.error('Lỗi khi cập nhật vai trò');
     }
   };
 
   const handleDonViChange = async (userId: string, donViID: string) => {
     try {
       await updateUserDonVi(userId, donViID);
-      toast.success('Cập nhật đơn vị thành công');
       fetchUsers();
     } catch (error) {
       console.error('Error updating don vi:', error);
-      toast.error('Lỗi khi cập nhật đơn vị');
     }
   };
 
@@ -166,11 +150,9 @@ export const useUser = () => {
     const handleRestore = async (id: string) => {
     try {
       await restoreUser(id);
-      toast.success('Khôi phục tài khoản thành công');
       await fetchDeletedUsers();
     } catch (error) {
       console.error('Error restoring user:', error);
-      toast.error('Lỗi khi khôi phục tài khoản');
     }
   };
 

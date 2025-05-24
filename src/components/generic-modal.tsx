@@ -39,8 +39,6 @@ const GenericModal = <T extends Record<string, any>>({
   title,
   initialData = {} as T,
   fields,
-  apiEndpoint,
-  method = "POST",
   onSave,
   children,
 }: GenericModalProps<T>) => {
@@ -159,7 +157,7 @@ const GenericModal = <T extends Record<string, any>>({
             zIndex: 1000,
           }}
         >
-          <LoadingSpinner variant={1} />
+          <LoadingSpinner variant={2} />
         </div>
       )}
       <DialogContent className="sm:max-w-md p-6">

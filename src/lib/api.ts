@@ -1,6 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
-import type { DonVi, NguoiDung, Roles } from '@/types/interfaces';
+import type { Roles } from '@/types/interfaces';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, 

@@ -115,7 +115,7 @@ export const UserTable: React.FC<UserTableProps> = ({
             zIndex: 1000,
           }}
         >
-          <LoadingSpinner variant={1} />
+          <LoadingSpinner variant={2} />
         </div>
       )}
 

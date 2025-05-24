@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getDonVis, createDonVi, updateDonVi, softDeleteDonVi, hardDeleteDonVi, getDeletedDonVis, restoreDonVi } from '@/lib/apidonvi';
-import { toast } from 'react-toastify';
 import type { DonVi } from '@/types/interfaces';
 import { getUserInfo } from '@/lib/api';
+import { useToast } from '@/components/toast-provider';
 
 export const useDonVi = () => {
   const [donViList, setDonViList] = useState<DonVi[]>([]);
@@ -13,6 +13,8 @@ export const useDonVi = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [userRole, setUserRole] = useState<string | null>(null);
 
+  const { addToast } = useToast();
+
   // Lấy thông tin user để kiểm tra role
   const fetchUserInfo = useCallback(async () => {
     console.log('fetchUserInfo called');
@@ -22,9 +24,8 @@ export const useDonVi = () => {
       console.log('Role from API:', userInfo.role);
     } catch (error) {
       console.error('Error fetching user info:', error);
-      toast.error('Lỗi khi lấy thông tin người dùng');
     }
-  }, []);
+  }, [addToast]);
 
   // Lấy danh sách đơn vị
   const fetchDonVi = useCallback(async () => {
@@ -40,11 +41,10 @@ export const useDonVi = () => {
       setFilteredDonViList(sortedDonVi);
     } catch (error) {
       console.error('Error fetching don vi:', error);
-      toast.error('Lỗi khi tải dữ liệu đơn vị');
     } finally {
       setLoading(false);
     }
-  }, [sortOrder]);
+  }, [sortOrder, addToast]);
 
   // Lấy danh sách đơn vị bị xóa mềm
   const fetchDeletedDonVis = useCallback(async () => {
@@ -55,9 +55,8 @@ export const useDonVi = () => {
       setDeletedDonViList(deletedDonVis);
     } catch (error) {
       console.error('Error fetching deleted don vi:', error);
-      toast.error('Lỗi khi tải đơn vị đã xóa');
     }
-  }, []);
+  }, [addToast]);
 
   // Tự động load dữ liệu khi hook khởi tạo
   useEffect(() => {
@@ -88,15 +87,15 @@ export const useDonVi = () => {
       const payload = { ...data };
       if (mode === 'create') {
         await createDonVi(payload);
-        toast.success('Tạo đơn vị thành công');
+        addToast('Tạo đơn vị thành công', 'success');
       } else {
         await updateDonVi(id!, payload);
-        toast.success('Cập nhật đơn vị thành công');
+        addToast('Cập nhật đơn vị thành công', 'success');
       }
       fetchDonVi();
     } catch (error) {
       console.error('Error saving don vi:', error);
-      toast.error('Lỗi khi lưu đơn vị');
+      addToast(`Lỗi khi ${mode === 'create' ? 'tạo' : 'cập nhật'} đơn vị`, 'error');
       throw error;
     }
   };
@@ -105,29 +104,37 @@ export const useDonVi = () => {
   const handleDelete = async (id: string, isHardDelete: boolean = false) => {
     try {
       if (isHardDelete) {
+        if (!canHardDelete) {
+          addToast('Bạn không có quyền xóa vĩnh viễn đơn vị', 'error');
+          throw new Error('Insufficient permissions');
+        }
         await hardDeleteDonVi(id);
-        toast.success('Xóa vĩnh viễn đơn vị thành công');
+        addToast('Xóa vĩnh viễn đơn vị thành công', 'success');
       } else {
         await softDeleteDonVi(id);
-        toast.success('Xóa mềm đơn vị thành công');
+        addToast('Xóa mềm đơn vị thành công', 'success');
       }
       fetchDonVi();
       fetchDeletedDonVis();
     } catch (error) {
       console.error('Error deleting don vi:', error);
-      toast.error(`Lỗi khi ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} đơn vị`);
+      addToast(`Lỗi khi ${isHardDelete ? 'xóa vĩnh viễn' : 'xóa mềm'} đơn vị`, 'error');
     }
   };
 
   // Xóa vĩnh viễn đơn vị
   const handlePermanentDelete = async (id: string) => {
     try {
+      if (!canHardDelete) {
+        addToast('Bạn không có quyền xóa vĩnh viễn đơn vị', 'error');
+        throw new Error('Insufficient permissions');
+      }
       await hardDeleteDonVi(id);
-      toast.success('Xóa vĩnh viễn đơn vị thành công');
+      addToast('Xóa vĩnh viễn đơn vị thành công', 'success');
       fetchDeletedDonVis();
     } catch (error) {
       console.error('Error permanently deleting don vi:', error);
-      toast.error('Lỗi khi xóa vĩnh viễn đơn vị');
+      addToast('Lỗi khi xóa vĩnh viễn đơn vị', 'error');
     }
   };
 
@@ -135,12 +142,12 @@ export const useDonVi = () => {
   const handleRestore = async (id: string) => {
     try {
       await restoreDonVi(id);
-      toast.success('Khôi phục đơn vị thành công');
+      addToast('Khôi phục đơn vị thành công', 'success');
       fetchDeletedDonVis();
       fetchDonVi();
     } catch (error) {
       console.error('Error restoring don vi:', error);
-      toast.error('Lỗi khi khôi phục đơn vị');
+      addToast('Lỗi khi khôi phục đơn vị', 'error');
     }
   };
 

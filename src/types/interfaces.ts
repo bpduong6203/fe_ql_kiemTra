@@ -42,3 +42,35 @@ export interface Roles {
     ten: string;
     moTa?: string;
 }
+
+export const LoaiTaiLieuOptions = [
+  { value: 1, label: 'Báo cáo' },
+  { value: 2, label: 'Biên bản' },
+  { value: 3, label: 'Tài liệu' },
+  { value: 4, label: 'Họp đoàn' },
+];
+
+export interface TaiLieu {
+  id: string;
+  tenFile: string;
+  linkFile: string;
+  ngayTao: string;
+  loaiTaiLieu: number; 
+  keHoachId: string;
+  keHoach?: KeHoach;
+}
+
+export interface KeHoach {
+  id: string;
+  tenKeHoach: string;
+  userId: string;
+  donViId: string;
+  ngayBatDau: string;
+  ngayKetThuc: string;
+  ghiChu?: string;
+  slug: string;
+  isDeleted: boolean;
+  nguoiDung?: NguoiDung;
+  donVi?: DonVi;
+  taiLieus?: TaiLieu[];
+}
