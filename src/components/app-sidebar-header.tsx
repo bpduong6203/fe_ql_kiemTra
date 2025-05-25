@@ -2,16 +2,11 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { type BreadcrumbItem as BreadcrumbItemType, type NavItem } from '@/types';
-import { Bell, ShoppingBag } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import PlanManager from './plan-manager';
 import AppearanceToggleTab from './appearance-tabs';
 
 const rightNavItems: NavItem[] = [
-    {
-      title: 'Giỏ hàng',
-      url: '#',
-      icon: ShoppingBag,
-    },
     {
       title: 'Thông báo',
       url: '#',

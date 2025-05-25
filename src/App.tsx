@@ -7,6 +7,8 @@ import KeHoach from './page/views/keHoach';
 import DonVi from './page/views/donVi';
 import NguoiDung from './page/views/nguoiDung';
 import { ToastProvider } from './components/toast-provider';
+import KeHoachDetails from './page/views/keHoachDetail';
+import { SelectedPlanProvider } from './context/SelectedPlanContext';
 
 const App = () => {
   console.log('Rendering App.tsx');
@@ -14,18 +16,22 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastProvider>
-        <Routes>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/403"  element={<ForbiddenPage />} />
-          <Route path="*"     element={<ForbiddenPage />} />
+        <SelectedPlanProvider>
+          <Routes>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/403"  element={<ForbiddenPage />} />
+            <Route path="*"     element={<ForbiddenPage />} />
 
-          <Route path="/ke_hoach" element={<KeHoach />} />
-          <Route path='/don_vi' element={<DonVi />} />
-          <Route path='/nguoi_dung' element={<NguoiDung />} />
-        </Routes>
+            <Route path="/ke_hoach" element={<KeHoach />} />
+            <Route path='/don_vi' element={<DonVi />} />
+            <Route path='/nguoi_dung' element={<NguoiDung />} />
+            <Route path='/chi_tiet_ke_hoach' element={<KeHoachDetails />} />
+          </Routes>          
+        </SelectedPlanProvider>
+
       </ToastProvider>
 
     </div>

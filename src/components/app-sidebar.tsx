@@ -38,7 +38,7 @@ const mainNavItems: NavItem[] = [
     icon: Calendar,
     items: [
       { title: 'Lập kế hoạch', url: '/ke_hoach' },
-      { title: 'Xem kế hoạch', url: '#plan-view' },
+      { title: 'Xem kế hoạch', url: '/chi_tiet_ke_hoach' },
     ],
   },
   {

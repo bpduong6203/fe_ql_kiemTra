@@ -3,7 +3,7 @@ import type { LoginError } from '@/types/auth';
 import type { Roles } from '@/types/interfaces';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, 
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
