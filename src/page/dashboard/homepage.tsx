@@ -58,7 +58,7 @@ const HomePage = () => {
               <DashboardCard
                 title="Người dùng"
                 icon="👥"
-                to="//nguoi_dung"
+                to="/nguoi_dung"
               />
               <DashboardCard
                 title="Đơn vị"
