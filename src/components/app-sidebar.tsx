@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -26,8 +25,6 @@ import {
 } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { apiFetch } from '@/lib/api';
 
 const mainNavItems: NavItem[] = [
   {
@@ -90,19 +87,6 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  useEffect(() => {
-    apiFetch('/auth/validate', { method: 'GET' })
-      .then(() => {
-        setIsLoggedIn(true); 
-      })
-      .catch(() => {
-        setIsLoggedIn(false); 
-        localStorage.removeItem('user');
-      });
-  }, []);
-
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
@@ -123,19 +107,7 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <NavFooter items={footerNavItems} className="mt-auto" />
-        {isLoggedIn ? (
-          <NavUser />
-        ) : (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Link to="/auth/login">
-                <Button size="lg" className="w-full text-sidebar-accent-foreground">
-                  Đăng nhập
-                </Button>
-              </Link>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
