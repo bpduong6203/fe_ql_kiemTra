@@ -89,36 +89,17 @@ const footerNavItems: NavItem[] = [
   },
 ];
 
-interface ValidateTokenResponse {
-  message: string;
-  userId: string;
-  username: string;
-  role: string;
-}
-
 export function AppSidebar() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
-    apiFetch<ValidateTokenResponse>('/auth/validate', { method: 'GET' })
-      .then((response) => {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            id: response.userId,
-            username: response.username,
-            roleID: response.role,
-            hoTen: response.username, 
-            email: '', 
-            avatar: null,
-            donViID: '',
-          })
-        );
-        setIsLoggedIn(true);
+    apiFetch('/auth/validate', { method: 'GET' })
+      .then(() => {
+        setIsLoggedIn(true); 
       })
       .catch(() => {
-        setIsLoggedIn(false);
-        localStorage.removeItem('user'); 
+        setIsLoggedIn(false); 
+        localStorage.removeItem('user');
       });
   }, []);
 
