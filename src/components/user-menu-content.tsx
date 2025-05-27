@@ -2,7 +2,7 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { Link } from 'react-router-dom';
-import { LogOut, Settings, User2 } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 import { type NguoiDung } from '@/types/interfaces';
@@ -35,12 +35,6 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem asChild>
-          <Link className="block w-full" to="/profile/editprofile" onClick={cleanup}>
-            <User2 className="mr-2" />
-            Cá nhân
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link className="block w-full" to="/settings/profile" onClick={cleanup}>
             <Settings className="mr-2" />
