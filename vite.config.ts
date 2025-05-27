@@ -8,7 +8,7 @@ import { env } from 'process';
 
 export default defineConfig({
  server: {
-   allowedHosts: ['tend-gratuit-may-controller.trycloudflare.com', 'localhost'],
+   allowedHosts: ['aurora-addressing-currency-each.trycloudflare.com', 'localhost'],
    proxy: {
      '/api': {
        target: env.VITE_API_BASE_URL,

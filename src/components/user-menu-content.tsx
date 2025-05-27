@@ -6,6 +6,7 @@ import { LogOut, Settings } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 import { type NguoiDung } from '@/types/interfaces';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserMenuContentProps {
   user: NguoiDung;
@@ -14,11 +15,13 @@ interface UserMenuContentProps {
 export function UserMenuContent({ user }: UserMenuContentProps) {
   const cleanup = useMobileNavigation();
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const handleLogout = async () => {
     try {
       await apiFetch('/auth/logout', { method: 'POST' }); 
       localStorage.removeItem('user'); 
+      await checkAuth();
       cleanup();
       navigate('/login');
     } catch (error) {

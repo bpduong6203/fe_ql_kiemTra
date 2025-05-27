@@ -8,6 +8,7 @@ import type { LoginResponse, LoginError } from '@/types/auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import LoadingSpinner from '@/components/loading-spinner';
+import { useAuth } from '@/context/AuthContext';
 
 const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: string) => void }) => {
   const [username, setUsername] = useState<string>('');
@@ -16,6 +17,7 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
       });
 
       localStorage.setItem('user', JSON.stringify(data.user));
-
+      await checkAuth();
       navigate('/');
 
       if (onSubmit) {

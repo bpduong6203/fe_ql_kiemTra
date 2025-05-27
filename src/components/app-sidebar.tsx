@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -27,7 +26,7 @@ import {
 import AppLogo from './app-logo';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { apiFetch } from '@/lib/api';
+import { useAuth } from '../context/AuthContext';
 
 const mainNavItems: NavItem[] = [
   {
@@ -90,19 +89,7 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Kiểm tra token hợp lệ bằng cách gọi api/auth/validate
-    apiFetch('/auth/validate', { method: 'GET' })
-      .then(() => {
-        setIsLoggedIn(true); // Token hợp lệ, giữ localStorage và hiển thị NavUser
-      })
-      .catch(() => {
-        setIsLoggedIn(false); // Token không hợp lệ, xóa localStorage và hiển thị nút Đăng nhập
-        localStorage.removeItem('user');
-      });
-  }, []);
+  const { isLoggedIn } = useAuth();
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -129,8 +116,8 @@ export function AppSidebar() {
         ) : (
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link to="/auth/login">
-                <Button size="lg" className="w-full" variant={'outline'}>
+              <Link to="/login">
+                <Button size="lg" className="w-full" variant={'destructive'}>
                   Đăng nhập
                 </Button>
               </Link>

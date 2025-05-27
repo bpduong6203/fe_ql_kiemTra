@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { fetchApiNoToken } from '@/lib/api';
 import type { RegisterResponse, LoginError } from '@/types/auth';
 import LoadingSpinner from '../loading-spinner';
+import { useAuth } from '@/context/AuthContext';
 
 interface FormErrors {
   username?: string;
@@ -23,6 +24,7 @@ const RegisterForm = ({ onSubmit }: { onSubmit?: (email: string, password: strin
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const validatePassword = (pwd: string): string | null => {
     if (!pwd || pwd.length <= 8) {
@@ -68,9 +70,8 @@ const RegisterForm = ({ onSubmit }: { onSubmit?: (email: string, password: strin
 
       console.log('Register successful:', data);
 
-      // Chỉ lưu user vào localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
-
+      await checkAuth();
       navigate('/');
 
       if (onSubmit) {
