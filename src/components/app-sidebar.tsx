@@ -45,7 +45,7 @@ const mainNavItems: NavItem[] = [
   },
   {
     title: 'Phân công',
-    url: '#',
+    url: '/phan_cong',
     icon: UserPlus,
   },
   {

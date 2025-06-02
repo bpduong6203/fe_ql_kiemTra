@@ -74,3 +74,19 @@ export interface KeHoach {
   donVi?: DonVi;
   taiLieus?: TaiLieu[];
 }
+
+export interface PhanCongUser {
+  id: string;
+  keHoachID: string;
+  userID: string;
+  linkFile: string;
+  noiDungCV: string;
+  ngayTao: string; 
+  nguoiDung: {
+    username: string;
+    hoTen: string;
+  };
+  keHoach: {
+    tenKeHoach: string;
+  };
+}

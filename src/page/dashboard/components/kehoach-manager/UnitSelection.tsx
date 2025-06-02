@@ -15,7 +15,7 @@ interface UnitSelectionProps {
   loading: boolean;
   selectedUnit: string | null;
   setSelectedUnit: React.Dispatch<React.SetStateAction<string | null>>;
-  error?: string | null; // Thêm prop error
+  error?: string | null; 
 }
 
 const UnitSelection: React.FC<UnitSelectionProps> = ({ units, loading, selectedUnit, setSelectedUnit, error }) => {

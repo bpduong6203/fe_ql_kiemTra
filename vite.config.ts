@@ -8,7 +8,7 @@ import { env } from 'process';
 
 export default defineConfig({
  server: {
-   allowedHosts: ['aurora-addressing-currency-each.trycloudflare.com', 'localhost'],
+   allowedHosts: ['quanlythanhtra.serveo.net', 'localhost'],
    proxy: {
      '/api': {
        target: env.VITE_API_BASE_URL,

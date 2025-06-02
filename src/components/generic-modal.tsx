@@ -20,6 +20,7 @@ import {
 import InputError from "@/components/input-error";
 import LoadingSpinner from "@/components/loading-spinner";
 import type { Field } from "@/types/interfaces";
+import { XIcon } from "lucide-react";
 
 interface GenericModalProps<T extends Record<string, any>> {
   isOpen: boolean;
@@ -53,34 +54,71 @@ const GenericModal = <T extends Record<string, any>>({
   useEffect(() => {
     if (fields.length > 0) {
       setFormData(stableInitialData);
-      setFileData(null);
-      setPreviewURL(null);
+      setFileData(null); // Reset fileData
+
+      const fileField = fields.find(f => f.type === 'file');
+      if (fileField && stableInitialData[fileField.name] && typeof stableInitialData[fileField.name] === 'string') {
+        setPreviewURL(stableInitialData[fileField.name]);
+      } else {
+        setPreviewURL(null); 
+      }
     }
-  }, [stableInitialData, fields.length]);
+  }, [stableInitialData, fields]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    setError(null); 
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setError(null); 
     if (file) {
-      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-        setError("Chỉ hỗ trợ JPEG, PNG, hoặc GIF");
+      const allowedFileTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ];
+
+      if (!allowedFileTypes.includes(file.type)) {
+        setError("Chỉ hỗ trợ JPEG, PNG, GIF, PDF, DOC, DOCX, XLS, XLSX.");
+        e.target.value = ''; 
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError("Ảnh phải nhỏ hơn 5MB");
+        setError("File phải nhỏ hơn 5MB.");
+        e.target.value = ''; 
         return;
       }
       setFileData(file);
-      setPreviewURL(URL.createObjectURL(file));
+      setPreviewURL(URL.createObjectURL(file)); e
+      setFormData({ ...formData, [e.target.name]: file.name });
+    } else {
+      setFileData(null);
+      setPreviewURL(null);
+      setFormData({ ...formData, [e.target.name]: '' });
     }
   };
 
+  const handleRemoveFile = (fieldName: string) => {
+    setFileData(null);
+    if (previewURL && previewURL.startsWith('blob:')) {
+      URL.revokeObjectURL(previewURL);
+    }
+    setPreviewURL(null);
+    setFormData({ ...formData, [fieldName]: '' }); 
+    setError(null); 
+  };
+
   const handleSelectChange = (name: string) => (value: string) => {
+    setError(null); 
     setFormData({ ...formData, [name]: value });
   };
 
@@ -88,21 +126,25 @@ const GenericModal = <T extends Record<string, any>>({
     e.preventDefault();
     if (isLoading) return;
 
-    // Kiểm tra các trường bắt buộc
     for (const field of fields) {
-      if (field.required && !formData[field.name]) {
-        setError(`Vui lòng nhập ${field.label}`);
-        return;
+      if (field.required) {
+        if (field.type === 'file' && !fileData && !formData[field.name]) {
+          setError(`Vui lòng chọn ${field.label}`);
+          return;
+        } else if (field.type !== 'file' && !formData[field.name]) {
+          setError(`Vui lòng nhập ${field.label}`);
+          return;
+        }
       }
     }
 
-    // Kiểm tra email
+    // Email validation
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError("Email không hợp lệ");
       return;
     }
 
-    // Kiểm tra mật khẩu
+    // Password validation
     if (formData.password) {
       const password = formData.password;
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
@@ -126,10 +168,10 @@ const GenericModal = <T extends Record<string, any>>({
       await onSave({ ...formData, file: fileData });
       setFormData(stableInitialData);
       setFileData(null);
-      if (previewURL) {
+      if (previewURL && previewURL.startsWith('blob:')) { 
         URL.revokeObjectURL(previewURL);
-        setPreviewURL(null);
       }
+      setPreviewURL(null);
       onClose();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Có lỗi xảy ra";
@@ -186,30 +228,46 @@ const GenericModal = <T extends Record<string, any>>({
                         </SelectContent>
                       </Select>
                     ) : field.type === "file" ? (
-                      <>
+                      <div className="flex flex-col gap-2">
                         <Input
                           id={field.name}
                           type="file"
                           name={field.name}
-                          accept="image/jpeg,image/png,image/gif"
+                          accept="image/jpeg,image/png,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                           onChange={handleFileChange}
                           placeholder={field.placeholder}
                           disabled={isLoading}
+                          className="file:text-sm file:font-medium file:cursor-pointer"
                         />
-                        {(previewURL || (field.name === "image" && formData[field.name])) && (
-                          <img
-                            src={
-                              previewURL ||
-                              (formData[field.name]
-                                ? `${process.env.NEXT_PUBLIC_IMG_URL}${formData[field.name]}`
-                                : "/images/default-course.png")
-                            }
-                            alt="Preview"
-                            className="mt-2 rounded border"
-                            style={{ width: "100%", maxHeight: "150px", objectFit: "cover" }}
-                          />
+
+                        {(previewURL || (formData[field.name] && typeof formData[field.name] === 'string')) && (
+                          <div className="flex items-center justify-between p-2 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                            <div className="flex items-center gap-2 truncate">
+                              {fileData && ["image/jpeg", "image/png", "image/gif"].includes(fileData.type) ? (
+                                <img
+                                  src={previewURL!}
+                                  alt="Preview"
+                                  className="size-8 object-cover rounded"
+                                />
+                              ) : (
+                                <span className="text-sm font-medium truncate">
+                                  {fileData ? fileData.name : (formData[field.name] as string).split('/').pop()}
+                                </span>
+                              )}
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveFile(field.name)}
+                              className="text-destructive p-1 h-auto"
+                              disabled={isLoading}
+                            >
+                              <XIcon className="size-4" />
+                            </Button>
+                          </div>
                         )}
-                      </>
+                      </div>
                     ) : (
                       <Input
                         id={field.name}

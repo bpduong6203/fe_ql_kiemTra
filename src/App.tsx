@@ -10,6 +10,7 @@ import { ToastProvider } from './components/toast-provider';
 import KeHoachDetails from './page/views/keHoachDetail';
 import { SelectedPlanProvider } from './context/SelectedPlanContext';
 import { AuthProvider } from './context/AuthContext';
+import PhanCong from './page/views/phanCong';
 
 const App = () => {
   console.log('Rendering App.tsx');
@@ -31,6 +32,7 @@ const App = () => {
               <Route path='/don_vi' element={<DonVi />} />
               <Route path='/nguoi_dung' element={<NguoiDung />} />
               <Route path='/chi_tiet_ke_hoach' element={<KeHoachDetails />} />
+              <Route path='/phan_cong' element={<PhanCong />} />
             </Routes>          
           </SelectedPlanProvider>
         </AuthProvider>
