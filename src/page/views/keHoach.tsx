@@ -1,6 +1,6 @@
 import React from "react";
 import KeHoach from "../dashboard/keHoach"; 
-import AppLayout from "../app-layout";
+import AppLayout from "../../layouts/app-layout";
 import type { BreadcrumbItem } from "@/types";
 import { useEffect } from "react";
 

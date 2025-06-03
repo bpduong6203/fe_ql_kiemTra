@@ -4,7 +4,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { type BreadcrumbItem as BreadcrumbItemType, type NavItem } from '@/types';
 import { Bell } from 'lucide-react';
 import PlanManager from './plan-manager';
-import AppearanceToggleTab from './appearance-tabs';
 
 const rightNavItems: NavItem[] = [
     {
@@ -24,7 +23,6 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
         </div>
         <div className="flex items-center space-x-2">
             <div className="relative flex items-center space-x-1">
-                <AppearanceToggleTab />
                 <div className="hidden lg:flex">
                     {rightNavItems.map((item) => (
                         <TooltipProvider key={item.title} delayDuration={0}>

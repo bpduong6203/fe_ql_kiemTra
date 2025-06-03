@@ -90,3 +90,13 @@ export interface PhanCongUser {
     tenKeHoach: string;
   };
 }
+
+export interface CurrentUserApiInfo {
+  userId: string;
+  role: string;
+  username?: string;
+  hoTen?: string;    
+  email?: string;    
+  soDienThoai?: string;
+  diaChi?: string;   
+}

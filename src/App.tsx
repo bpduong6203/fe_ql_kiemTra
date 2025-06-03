@@ -11,6 +11,9 @@ import KeHoachDetails from './page/views/keHoachDetail';
 import { SelectedPlanProvider } from './context/SelectedPlanContext';
 import { AuthProvider } from './context/AuthContext';
 import PhanCong from './page/views/phanCong';
+import Appearance from './page/settings/appearance';
+import Profile from './page/settings/profile';
+import Password from './page/settings/password';
 
 const App = () => {
   console.log('Rendering App.tsx');
@@ -33,6 +36,9 @@ const App = () => {
               <Route path='/nguoi_dung' element={<NguoiDung />} />
               <Route path='/chi_tiet_ke_hoach' element={<KeHoachDetails />} />
               <Route path='/phan_cong' element={<PhanCong />} />
+              <Route path='/settings/appearance' element={<Appearance />} />
+              <Route path='/settings/profile' element={<Profile />} />
+              <Route path='/settings/password' element={<Password />} />
             </Routes>          
           </SelectedPlanProvider>
         </AuthProvider>

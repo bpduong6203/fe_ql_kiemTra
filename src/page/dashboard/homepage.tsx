@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import AppLayout from '../app-layout';
+import AppLayout from '../../layouts/app-layout';
 
 const HomePage = () => {
   useEffect(() => {

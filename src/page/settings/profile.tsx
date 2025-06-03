@@ -1,0 +1,227 @@
+import { useState, useEffect, type FormEventHandler } from 'react';
+import { type BreadcrumbItem } from '@/types';
+import HeadingSmall from '@/components/heading-small';
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
+import { useToast } from '@/components/toast-provider';
+import { getUserInfo } from '@/lib/api';
+import { updateUser } from '@/lib/apiuser';
+import type { NguoiDung } from '@/types/interfaces';
+
+type ProfileProps = {};
+
+// Định nghĩa kiểu cho form data, phản ánh các trường UI và dữ liệu cần gửi
+type ProfileForm = {
+    id: string;
+    username: string; 
+    hoTen: string;
+    email: string;
+    soDienThoai?: string;
+    diaChi?: string;
+    roleID?: string;
+    donViID?: string;
+    avatar?: string | null;
+};
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Profile settings',
+        href: '/settings/profile', // Đổi href thành url để khớp với NavItem
+    },
+];
+
+export default function Profile({}: ProfileProps) {
+    const { addToast } = useToast();
+    const [formData, setFormData] = useState<ProfileForm>({
+        id: '',
+        username: '',
+        hoTen: '',
+        email: '',
+        soDienThoai: '',
+        diaChi: '',
+        roleID: '', // Khởi tạo các trường optional nếu backend yêu cầu
+        donViID: '',
+        avatar: null,
+    });
+    const [errors, setErrors] = useState<Partial<ProfileForm>>({});
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Đảm bảo getUserInfo trả về NguoiDung đầy đủ như interface NguoiDung đã định nghĩa
+                // (có id, username, hoTen, email, soDienThoai, diaChi, roleID, donViID, avatar)
+                const userInfo: NguoiDung = await getUserInfo();
+
+                setFormData({
+                    id: userInfo.id,
+                    username: userInfo.username,
+                    hoTen: userInfo.hoTen || '',
+                    email: userInfo.email || '',
+                    soDienThoai: userInfo.soDienThoai || '',
+                    diaChi: userInfo.diaChi || '',
+                    roleID: userInfo.roleID, // Đảm bảo trường này được lấy từ userInfo
+                    donViID: userInfo.donViID, // Đảm bảo trường này được lấy từ userInfo
+                    avatar: userInfo.avatar || null, // Đảm bảo trường này được lấy từ userInfo
+                });
+            } catch (err) {
+                console.error('Error fetching user info:', err);
+                addToast('Lỗi khi tải thông tin người dùng.', 'error');
+            }
+        };
+
+        fetchUserData();
+    }, [addToast]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name as keyof ProfileForm]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const submit: FormEventHandler<HTMLFormElement> = async (e) => {
+        e.preventDefault();
+        setProcessing(true);
+        setErrors({}); // Clear previous errors
+
+        if (!formData.id) {
+            addToast('Không tìm thấy ID người dùng để cập nhật.', 'error');
+            setProcessing(false);
+            return;
+        }
+
+        // Chuẩn bị payload để gửi lên API
+        const payload: Partial<NguoiDung> = {
+            // Các trường phải gửi lên backend để khớp với RegisterModel/NguoiDung DTO của backend
+            // ngay cả khi không thay đổi, để tránh lỗi validation.
+            username: formData.username, // Tên đăng nhập không đổi, nhưng phải gửi lên
+            hoTen: formData.hoTen,
+            email: formData.email,
+            soDienThoai: formData.soDienThoai,
+            diaChi: formData.diaChi,
+            roleID: formData.roleID, // Gửi roleID hiện tại
+            donViID: formData.donViID, // Gửi donViID hiện tại
+            avatar: formData.avatar, // Gửi avatar hiện tại
+            // Password không được gửi từ form này
+        };
+
+        try {
+            const response = await updateUser(formData.id, payload); // Gọi API updateUser
+
+            addToast(response.message || 'Cập nhật profile thành công!', 'success');
+            setRecentlySuccessful(true);
+            setTimeout(() => setRecentlySuccessful(false), 2000);
+
+        } catch (err: any) {
+            console.error('Error updating profile:', err);
+            if (err.response?.data?.errors) {
+                // Nếu backend trả về lỗi validation: { errors: { fieldName: ["error message"], ... } }
+                setErrors(err.response.data.errors);
+            } else {
+                addToast(err.message || 'Lỗi khi cập nhật profile.', 'error');
+            }
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <SettingsLayout>
+                <div className="space-y-6">
+                    <HeadingSmall title="Thông tin cá nhân" description="Cập nhật tên, email và các thông tin khác của bạn" />
+
+                    <form onSubmit={submit} className="space-y-6">
+                        <div className="grid gap-2">
+                            <Label htmlFor="username">Tên đăng nhập</Label>
+                            <Input
+                                id="username"
+                                name="username"
+                                className="mt-1 block w-full"
+                                value={formData.username}
+                                onChange={handleChange} // Mặc dù readOnly, vẫn giữ onChange để tránh warning
+                                required
+                                readOnly // Tên đăng nhập thường không cho phép thay đổi
+                                placeholder="Tên đăng nhập"
+                            />
+                            <InputError className="mt-2" message={errors.username} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="hoTen">Họ và Tên</Label>
+                            <Input
+                                id="hoTen"
+                                name="hoTen"
+                                className="mt-1 block w-full"
+                                value={formData.hoTen || ''}
+                                onChange={handleChange}
+                                required
+                                autoComplete="name"
+                                placeholder="Họ và Tên"
+                            />
+                            <InputError className="mt-2" message={errors.hoTen} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                className="mt-1 block w-full"
+                                value={formData.email || ''}
+                                onChange={handleChange}
+                                required
+                                autoComplete="username"
+                                placeholder="Địa chỉ Email"
+                            />
+                            <InputError className="mt-2" message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="soDienThoai">Số điện thoại</Label>
+                            <Input
+                                id="soDienThoai"
+                                name="soDienThoai"
+                                type="tel"
+                                className="mt-1 block w-full"
+                                value={formData.soDienThoai || ''}
+                                onChange={handleChange}
+                                placeholder="Số điện thoại"
+                            />
+                            <InputError className="mt-2" message={errors.soDienThoai} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="diaChi">Địa chỉ</Label>
+                            <Input
+                                id="diaChi"
+                                name="diaChi"
+                                className="mt-1 block w-full"
+                                value={formData.diaChi || ''}
+                                onChange={handleChange}
+                                placeholder="Địa chỉ"
+                            />
+                            <InputError className="mt-2" message={errors.diaChi} />
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <Button disabled={processing}>Lưu</Button>
+
+                            {recentlySuccessful && (
+                                <p className="text-sm text-green-600">Đã lưu!</p>
+                            )}
+                        </div>
+                    </form>
+                </div>
+            </SettingsLayout>
+        </AppLayout>
+    );
+}

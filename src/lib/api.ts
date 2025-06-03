@@ -1,6 +1,6 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { LoginError } from '@/types/auth';
-import type { Roles } from '@/types/interfaces';
+import type { NguoiDung, Roles } from '@/types/interfaces';
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
@@ -83,6 +83,7 @@ export async function getAllRoles(): Promise<Roles[]> {
 }
 
 // Get user info
-export async function getUserInfo(): Promise<{ userId: string; role: string }> {
-  return apiFetch('/auth/user', { method: 'GET' });
+export async function getUserInfo(): Promise<NguoiDung> {
+  const response = await apiFetch<NguoiDung>('/auth/user', { method: 'GET' });
+  return response; 
 }
