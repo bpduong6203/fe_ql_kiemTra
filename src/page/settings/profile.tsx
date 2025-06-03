@@ -13,7 +13,6 @@ import type { NguoiDung } from '@/types/interfaces';
 
 type ProfileProps = {};
 
-// Định nghĩa kiểu cho form data, phản ánh các trường UI và dữ liệu cần gửi
 type ProfileForm = {
     id: string;
     username: string; 
@@ -23,13 +22,13 @@ type ProfileForm = {
     diaChi?: string;
     roleID?: string;
     donViID?: string;
-    avatar?: string | null;
+    password?: string; 
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
-        href: '/settings/profile', // Đổi href thành url để khớp với NavItem
+        href: '/settings/profile', 
     },
 ];
 
@@ -42,9 +41,9 @@ export default function Profile({}: ProfileProps) {
         email: '',
         soDienThoai: '',
         diaChi: '',
-        roleID: '', // Khởi tạo các trường optional nếu backend yêu cầu
+        roleID: '', 
         donViID: '',
-        avatar: null,
+        password: '',
     });
     const [errors, setErrors] = useState<Partial<ProfileForm>>({});
     const [processing, setProcessing] = useState(false);
@@ -53,8 +52,6 @@ export default function Profile({}: ProfileProps) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Đảm bảo getUserInfo trả về NguoiDung đầy đủ như interface NguoiDung đã định nghĩa
-                // (có id, username, hoTen, email, soDienThoai, diaChi, roleID, donViID, avatar)
                 const userInfo: NguoiDung = await getUserInfo();
 
                 setFormData({
@@ -64,9 +61,8 @@ export default function Profile({}: ProfileProps) {
                     email: userInfo.email || '',
                     soDienThoai: userInfo.soDienThoai || '',
                     diaChi: userInfo.diaChi || '',
-                    roleID: userInfo.roleID, // Đảm bảo trường này được lấy từ userInfo
-                    donViID: userInfo.donViID, // Đảm bảo trường này được lấy từ userInfo
-                    avatar: userInfo.avatar || null, // Đảm bảo trường này được lấy từ userInfo
+                    roleID: userInfo.roleID,
+                    donViID: userInfo.donViID, 
                 });
             } catch (err) {
                 console.error('Error fetching user info:', err);
@@ -88,7 +84,7 @@ export default function Profile({}: ProfileProps) {
     const submit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         setProcessing(true);
-        setErrors({}); // Clear previous errors
+        setErrors({}); 
 
         if (!formData.id) {
             addToast('Không tìm thấy ID người dùng để cập nhật.', 'error');
@@ -96,23 +92,19 @@ export default function Profile({}: ProfileProps) {
             return;
         }
 
-        // Chuẩn bị payload để gửi lên API
         const payload: Partial<NguoiDung> = {
-            // Các trường phải gửi lên backend để khớp với RegisterModel/NguoiDung DTO của backend
-            // ngay cả khi không thay đổi, để tránh lỗi validation.
-            username: formData.username, // Tên đăng nhập không đổi, nhưng phải gửi lên
+            username: formData.username, 
             hoTen: formData.hoTen,
             email: formData.email,
             soDienThoai: formData.soDienThoai,
             diaChi: formData.diaChi,
-            roleID: formData.roleID, // Gửi roleID hiện tại
-            donViID: formData.donViID, // Gửi donViID hiện tại
-            avatar: formData.avatar, // Gửi avatar hiện tại
-            // Password không được gửi từ form này
+            roleID: formData.roleID, 
+            donViID: formData.donViID, 
+            password: formData.password, 
         };
 
         try {
-            const response = await updateUser(formData.id, payload); // Gọi API updateUser
+            const response = await updateUser(formData.id, payload); 
 
             addToast(response.message || 'Cập nhật profile thành công!', 'success');
             setRecentlySuccessful(true);
@@ -121,7 +113,6 @@ export default function Profile({}: ProfileProps) {
         } catch (err: any) {
             console.error('Error updating profile:', err);
             if (err.response?.data?.errors) {
-                // Nếu backend trả về lỗi validation: { errors: { fieldName: ["error message"], ... } }
                 setErrors(err.response.data.errors);
             } else {
                 addToast(err.message || 'Lỗi khi cập nhật profile.', 'error');
@@ -145,9 +136,9 @@ export default function Profile({}: ProfileProps) {
                                 name="username"
                                 className="mt-1 block w-full"
                                 value={formData.username}
-                                onChange={handleChange} // Mặc dù readOnly, vẫn giữ onChange để tránh warning
+                                onChange={handleChange} 
                                 required
-                                readOnly // Tên đăng nhập thường không cho phép thay đổi
+                                readOnly 
                                 placeholder="Tên đăng nhập"
                             />
                             <InputError className="mt-2" message={errors.username} />
