@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { useToast } from '@/components/toast-provider';
-import { getUserInfo } from '@/lib/api';
-import { updateUser } from '@/lib/apiuser';
+import { updateUser, getUserInfo } from '@/lib/apiuser';
 import type { NguoiDung } from '@/types/interfaces';
 
 type ProfileProps = {};

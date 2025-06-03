@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/toast-provider';
-import { getUserInfo } from '@/lib/api';
-import { updateUser } from '@/lib/apiuser';
+import { updateUser, getUserInfo } from '@/lib/apiuser';
 import type { NguoiDung } from '@/types/interfaces';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -43,8 +42,8 @@ export default function Password() {
     useEffect(() => {
         const fetchUserId = async () => {
             try {
-                // const userInfo: NguoiDung = await getUserInfo();
-                // setCurrentUserId(userInfo.id);
+                const userInfo: NguoiDung = await getUserInfo();
+                setCurrentUserId(userInfo.id);
             } catch (error) {
                 console.error('Error fetching user ID:', error);
                 addToast('Không thể tải thông tin người dùng để cập nhật mật khẩu.', 'error');
@@ -99,18 +98,18 @@ export default function Password() {
         }
 
         try {
-            // const currentUserInfo: NguoiDung = await getUserInfo();
+            const currentUserInfo: NguoiDung = await getUserInfo();
 
             const payload: Partial<NguoiDung> = {
                 id: currentUserId,
-                // username: currentUserInfo.username,
-                // email: currentUserInfo.email,
-                // hoTen: currentUserInfo.hoTen,
-                // soDienThoai: currentUserInfo.soDienThoai,
-                // diaChi: currentUserInfo.diaChi,
-                // roleID: currentUserInfo.roleID,
-                // donViID: currentUserInfo.donViID,
-                // avatar: currentUserInfo.avatar,
+                username: currentUserInfo.username,
+                email: currentUserInfo.email,
+                hoTen: currentUserInfo.hoTen,
+                soDienThoai: currentUserInfo.soDienThoai,
+                diaChi: currentUserInfo.diaChi,
+                roleID: currentUserInfo.roleID,
+                donViID: currentUserInfo.donViID,
+                avatar: currentUserInfo.avatar,
 
                 password: formData.password,
             };

@@ -1,7 +1,6 @@
 import type { NguoiDung } from "@/types/interfaces";
 import { apiFetch } from "./api";
 
-// User APIs
 export async function getAllUsers(): Promise<NguoiDung[]> {
   return apiFetch('/auth/users', { method: 'GET' });
 }
@@ -36,4 +35,9 @@ export async function hardDeleteUser(id: string): Promise<{ message: string }> {
 
 export async function restoreUser(id: string): Promise<{ message: string }> {
   return apiFetch(`/auth/users/restore/${id}`, { method: 'PATCH' });
+}
+
+export async function getUserInfo(): Promise<NguoiDung> {
+  const response = await apiFetch<NguoiDung>('/auth/user', { method: 'GET' });
+  return response; 
 }
