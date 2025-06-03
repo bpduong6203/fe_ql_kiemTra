@@ -27,7 +27,6 @@ export const useKeHoach = () => {
     try {
       const userInfo = await getUserInfo();
       setUserRole(userInfo.role);
-      console.log('Role from API:', userInfo.role);
     } catch (error) {
       console.error('Error fetching user info:', error);
     }
