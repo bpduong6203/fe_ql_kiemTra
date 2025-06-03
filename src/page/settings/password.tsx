@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'; 
+import { useState, useRef, useEffect } from 'react';
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/toast-provider';
-import { updateUser, getUserInfo } from '@/lib/apiuser';
+import { updatePassword as updatePasswordAPI, getUserInfo } from '@/lib/apiuser';
 import type { NguoiDung } from '@/types/interfaces';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -37,7 +37,7 @@ export default function Password() {
     const [errors, setErrors] = useState<Partial<PasswordForm>>({});
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [, setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserId = async () => {
@@ -60,19 +60,11 @@ export default function Password() {
         }
     };
 
-    // KHÔNG CÒN SỬ DỤNG FormEventHandler Ở ĐÂY
-    const updatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitPasswordUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
 
-        if (!currentUserId) {
-            addToast('Không tìm thấy ID người dùng. Vui lòng thử lại.', 'error');
-            setProcessing(false);
-            return;
-        }
-
-        // Client-side validation (giữ nguyên logic)
         if (!formData.current_password) {
             setErrors(prev => ({ ...prev, current_password: 'Mật khẩu hiện tại không được để trống.' }));
             setProcessing(false); return;
@@ -98,23 +90,11 @@ export default function Password() {
         }
 
         try {
-            const currentUserInfo: NguoiDung = await getUserInfo();
-
-            const payload: Partial<NguoiDung> = {
-                id: currentUserId,
-                username: currentUserInfo.username,
-                email: currentUserInfo.email,
-                hoTen: currentUserInfo.hoTen,
-                soDienThoai: currentUserInfo.soDienThoai,
-                diaChi: currentUserInfo.diaChi,
-                roleID: currentUserInfo.roleID,
-                donViID: currentUserInfo.donViID,
-                avatar: currentUserInfo.avatar,
-
+            const response = await updatePasswordAPI({
+                current_password: formData.current_password,
                 password: formData.password,
-            };
-
-            const response = await updateUser(currentUserId, payload);
+                password_confirmation: formData.password_confirmation,
+            });
 
             addToast(response.message || 'Cập nhật mật khẩu thành công!', 'success');
             setRecentlySuccessful(true);
@@ -125,10 +105,10 @@ export default function Password() {
                 password: '',
                 password_confirmation: '',
             });
-            passwordInput.current?.focus();
+            currentPasswordInput.current?.focus(); 
 
         } catch (err: any) {
-            console.error('Error updating password:', err);
+            console.error('Lỗi khi cập nhật mật khẩu:', err);
             if (err.response?.data?.errors) {
                 setErrors(err.response.data.errors);
                 if (err.response.data.errors.password) {
@@ -137,7 +117,7 @@ export default function Password() {
                     currentPasswordInput.current?.focus();
                 }
             } else {
-                addToast(err.message || 'Lỗi khi cập nhật mật khẩu.', 'error');
+                addToast(err.message || 'Đã xảy ra lỗi khi cập nhật mật khẩu.', 'error');
             }
         } finally {
             setProcessing(false);
@@ -150,7 +130,7 @@ export default function Password() {
                 <div className="space-y-6">
                     <HeadingSmall title="Cập nhật mật khẩu" description="Đảm bảo tài khoản của bạn sử dụng mật khẩu dài, ngẫu nhiên để an toàn" />
 
-                    <form onSubmit={updatePassword} className="space-y-6">
+                    <form onSubmit={handleSubmitPasswordUpdate} className="space-y-6"> {/* Thay đổi ở đây */}
                         <div className="grid gap-2">
                             <Label htmlFor="current_password">Mật khẩu hiện tại</Label>
                             <Input

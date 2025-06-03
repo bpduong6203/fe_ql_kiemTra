@@ -41,3 +41,9 @@ export async function getUserInfo(): Promise<NguoiDung> {
   const response = await apiFetch<NguoiDung>('/auth/profile', { method: 'GET' });
   return response; 
 }
+
+export async function updatePassword(
+  data: { current_password: string; password: string; password_confirmation: string }
+): Promise<{ message: string }> {
+  return apiFetch(`/auth/change-password`, { method: 'PATCH', data });
+}
