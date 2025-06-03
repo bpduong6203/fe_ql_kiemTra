@@ -38,6 +38,6 @@ export async function restoreUser(id: string): Promise<{ message: string }> {
 }
 
 export async function getUserInfo(): Promise<NguoiDung> {
-  const response = await apiFetch<NguoiDung>('/auth/user', { method: 'GET' });
+  const response = await apiFetch<NguoiDung>('/auth/profile', { method: 'GET' });
   return response; 
 }
