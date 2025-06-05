@@ -1,8 +1,12 @@
-export default function HeadingSmall({ title, description }: { title: string; description?: string }) {
+import { cn } from '@/lib/utils';
+
+export default function HeadingSmall({ title, description, className }: { title: string; description?: string; className?: string }) {
     return (
-        <header>
-            <h3 className="mb-0.5 text-base font-medium">{title}</h3>
-            {description && <p className="text-muted-foreground text-sm">{description}</p>}
+        <header className={cn("space-y-0.5", className)}>
+            <h3 className="mb-0.5 text-base md:text-lg font-medium">
+                {title}
+            </h3>
+            {description && <p className="text-muted-foreground text-xs md:text-sm max-w-prose break-words">{description}</p>}
         </header>
     );
 }

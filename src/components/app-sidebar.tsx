@@ -8,7 +8,8 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem, 
+  useSidebar, 
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import {
@@ -22,10 +23,10 @@ import {
   UserPlus,
   Users,
   Building,
+  LogIn,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '../context/AuthContext';
 
 const mainNavItems: NavItem[] = [
@@ -49,8 +50,8 @@ const mainNavItems: NavItem[] = [
     icon: UserPlus,
   },
   {
-    title: 'Kiểm tra',
-    url: '#',
+    title: 'Giải trình',
+    url: '/giai_trinh',
     icon: ClipboardList,
   },
   {
@@ -90,6 +91,13 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const { isLoggedIn } = useAuth();
+  const { setOpen, state, isMobile } = useSidebar();
+
+  const handleLoginClick = () => {
+    if (!isMobile && state === 'collapsed') {
+      setOpen(true); 
+    }
+  };
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -116,11 +124,20 @@ export function AppSidebar() {
         ) : (
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link to="/login">
-                <Button size="lg" className="w-full" variant={'destructive'}>
-                  Đăng nhập
-                </Button>
-              </Link>
+              <SidebarMenuButton
+                size="lg"
+                className="bg-destructive text-white hover:text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+                asChild
+                tooltip="Đăng nhập"
+                onClick={handleLoginClick} 
+              >
+                <Link to="/login" className="flex items-center w-full gap-2"> 
+                  <LogIn className="ml-2 size-5 shrink-0" /> 
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Đăng nhập
+                  </span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         )}

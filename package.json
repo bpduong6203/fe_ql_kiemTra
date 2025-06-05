@@ -28,6 +28,7 @@
     "@tailwindcss/vite": "^4.1.7",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
+    "date-fns": "^4.1.0",
     "fe-ql-kiemtra": "file:",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.479.0",

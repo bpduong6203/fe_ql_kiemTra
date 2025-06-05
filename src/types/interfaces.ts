@@ -100,3 +100,60 @@ export interface CurrentUserApiInfo {
   soDienThoai?: string;
   diaChi?: string;   
 }
+
+export interface GiaiTrinhFile {
+  id: string;
+  giaiTrinhID: string;
+  linkFile: string;
+  tenFile: string;
+  ngayTao: string;
+}
+
+export interface NguoiDungSelectedInfo {
+  username: string;
+  hoTen: string;
+  id?: string;
+}
+
+export interface KeHoachSelectedInfo {
+  tenKeHoach: string;
+}
+
+export interface GiaiTrinh {
+  id: string;
+  keHoachID: string;
+  nguoiYeuCauID: string;
+  nguoiGiaiTrinhID: string;
+  ngayTao: string;
+  trangThaiTongThe: string;
+  nguoiYeuCau: NguoiDungSelectedInfo;
+  nguoiGiaiTrinh: NguoiDungSelectedInfo;
+  keHoach: KeHoachSelectedInfo;
+  giaiTrinhFiles: GiaiTrinhFile[]; 
+}
+
+export interface NDGiaiTrinh {
+  id: string;
+  giaiTrinhID: string;
+  noiDung?: string; 
+  tenFile?: string; 
+  linkFile?: string;
+  ngayTao: string;
+  daXem: boolean;
+  trangThai: string;
+  nguoiDanhGiaID?: string; 
+  ngayDanhGia?: string; 
+  nguoiDanhGia?: NguoiDungSelectedInfo; 
+}
+
+export interface NDGiaiTrinhPayload {
+  giaiTrinhID: string;
+  noiDung?: string;
+  tenFile?: string;
+  linkFile?: string;
+  nguoiDanhGiaID?: string;
+}
+
+export interface DanhGiaNDGiaiTrinhPayload {
+  trangThai: 'Đạt' | 'Chưa Đạt'; 
+}

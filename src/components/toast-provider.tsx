@@ -5,13 +5,13 @@ import Toast from './ui/toast';
 interface Toast {
   id: string;
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'info';
   duration: number;
   open: boolean;
 }
 
 interface ToastContextType {
-  addToast: (message: string, type?: 'success' | 'error', duration?: number) => void;
+  addToast: (message: string, type?: 'success' | 'error' | 'info', duration?: number) => void;
 }
 
 const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
@@ -41,7 +41,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback(
-    (message: string, type: 'success' | 'error' = 'success', duration = 3000) => {
+    (message: string, type: 'success' | 'error' | 'info' = 'success', duration = 3000) => {
       const id = Math.random().toString(36).substr(2, 9);
       setToasts((prev) => [...prev, { id, message, type, duration, open: true }]);
     },
