@@ -18,17 +18,14 @@ export const useUser = () => {
   const { addToast } = useToast();
 
   const fetchUserInfo = useCallback(async () => {
-    console.log('fetchUserInfo called');
     try {
       const userInfo = await getUserInfo();
       setUserRole(userInfo.role);
     } catch (error) {
-      console.error('Error fetching user info:', error);
     }
   }, []);
 
   const fetchUsers = useCallback(async () => {
-    console.log('fetchUsers called');
     try {
       setLoading(true);
       const [users, roles, donVis] = await Promise.all([
@@ -44,7 +41,6 @@ export const useUser = () => {
       setRolesList(roles);
       setDonViList(donVis);
     } catch (error) {
-      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
@@ -56,7 +52,6 @@ export const useUser = () => {
       const deleted = await getDeletedUsers();
       setDeletedUsers(deleted);
     } catch (error) {
-      console.error('Error fetching deleted users:', error);
     } finally {
       setLoading(false);
     }
@@ -67,7 +62,6 @@ export const useUser = () => {
       await hardDeleteUser(id);
       await fetchDeletedUsers();
     } catch (error) {
-      console.error('Error permanently deleting user:', error);
     }
   };
 
@@ -92,7 +86,6 @@ export const useUser = () => {
       }
       fetchUsers();
     } catch (error) {
-      console.error('Error saving user:', error);
       throw error;
     }
   };
@@ -108,7 +101,6 @@ export const useUser = () => {
       }
       fetchUsers();
     } catch (error) {
-      console.error('Error deleting user:', error);
     }
   };
 
@@ -118,7 +110,6 @@ export const useUser = () => {
       fetchUsers();
       addToast('Cập nhật vai trò thành công!', 'success');
     } catch (error) {
-      console.error('Error updating role:', error);
     }
   };
 
@@ -128,7 +119,6 @@ export const useUser = () => {
       fetchUsers();
       addToast('Cập nhật đơn vị thành công', 'success');
     } catch (error) {
-      console.error('Error updating don vi:', error);
     }
   };
 
@@ -161,7 +151,6 @@ export const useUser = () => {
       await fetchUsers();
       addToast('Khôi phục thành công!', 'success');
     } catch (error) {
-      console.error('Error restoring user:', error);
     }
   };
 

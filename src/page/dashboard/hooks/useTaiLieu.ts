@@ -19,18 +19,15 @@ export const useTaiLieu = () => {
 
   // Lấy thông tin user để kiểm tra role
   const fetchUserInfo = useCallback(async () => {
-    console.log('fetchUserInfo called');
     try {
       const userInfo = await getUserInfo();
       setUserRole(userInfo.role);
     } catch (error) {
-      console.error('Error fetching user info:', error);
     }
   }, [addToast]);
 
   // Lấy danh sách tài liệu và kế hoạch
   const fetchTaiLieus = useCallback(async () => {
-    console.log('fetchTaiLieus called');
     try {
       setLoading(true);
       const [taiLieus, keHoachs] = await Promise.all([getTaiLieus(), getKeHoachs()]);
@@ -43,7 +40,6 @@ export const useTaiLieu = () => {
       setFilteredTaiLieuList(sortedTaiLieus);
       setKeHoachList(keHoachs);
     } catch (error) {
-      console.error('Error fetching tài liệu:', error);
     } finally {
       setLoading(false);
     }
@@ -91,7 +87,6 @@ export const useTaiLieu = () => {
       fetchTaiLieus();
       addToast('Tạo tài liệu thành công', 'success');
     } catch (error) {
-      console.error('Error creating tài liệu:', error);
       addToast('Lỗi khi tạo tài liệu', 'error');
       throw error;
     }
@@ -108,7 +103,6 @@ export const useTaiLieu = () => {
       fetchTaiLieus();
       addToast('Xóa tài liệu thành công', 'success');
     } catch (error) {
-      console.error('Error deleting tài liệu:', error);
       addToast('Lỗi khi xóa tài liệu', 'error');
     }
   };

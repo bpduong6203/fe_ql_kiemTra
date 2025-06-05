@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import loading1 from '@/assets/Animation - 1748074983693.json';
-import loading2 from '@/assets/Animation - 1749109042086.json';
+import loading2 from '@/assets/Animation - 1749116080857.json';
 
 const Player = lazy(() => import('lottie-react'));
 

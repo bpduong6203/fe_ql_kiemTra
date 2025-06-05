@@ -31,7 +31,6 @@ export const useGiaiTrinh = () => {
       setUserRole(userInfo.role);
       setCurrentUsername(userInfo.username);
     } catch (error) {
-      console.error('Lỗi khi tải thông tin người dùng:', error);
       setUserRole(null);
       setCurrentUsername(null);
     }
@@ -55,7 +54,6 @@ export const useGiaiTrinh = () => {
       setNguoiDungList(nguoiDungs);
 
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu giải trình:', error);
       addToast('Lỗi khi tải dữ liệu giải trình', 'error');
       setGiaiTrinh(null);
     } finally {
@@ -147,7 +145,6 @@ export const useGiaiTrinh = () => {
         await fetchGiaiTrinhForSelectedPlan();
         setSelectedLocalFiles([]);
     } catch (error) {
-      console.error(`Lỗi khi lưu giải trình:`, error);
       addToast(`Lỗi khi lưu giải trình`, 'error');
       throw error;
     } finally {
@@ -171,7 +168,6 @@ export const useGiaiTrinh = () => {
         addToast('Giải trình đã được đánh dấu hoàn thành!', 'success');
         await fetchGiaiTrinhForSelectedPlan();
     } catch (error) {
-        console.error('Lỗi khi hoàn thành giải trình:', error);
         addToast('Lỗi khi hoàn thành giải trình', 'error');
     } finally {
         setLoading(false);
@@ -189,7 +185,6 @@ export const useGiaiTrinh = () => {
       addToast('Xóa giải trình thành công', 'success');
       await fetchGiaiTrinhForSelectedPlan();
     } catch (error) {
-      console.error('Lỗi khi xóa giải trình:', error);
       addToast('Lỗi khi xóa giải trình', 'error');
     } finally {
       setLoading(false);
@@ -203,7 +198,6 @@ export const useGiaiTrinh = () => {
         addToast('Xóa file giải trình thành công', 'success');
         await fetchGiaiTrinhForSelectedPlan();
     } catch (error) {
-        console.error('Lỗi khi xóa file giải trình:', error);
         addToast('Lỗi khi xóa file giải trình', 'error');
     } finally {
         setLoading(false);

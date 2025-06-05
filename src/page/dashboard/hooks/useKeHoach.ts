@@ -23,18 +23,15 @@ export const useKeHoach = () => {
 
   // Lấy thông tin user để kiểm tra role
   const fetchUserInfo = useCallback(async () => {
-    console.log('fetchUserInfo called');
     try {
       const userInfo = await getUserInfo();
       setUserRole(userInfo.role);
     } catch (error) {
-      console.error('Error fetching user info:', error);
     }
   }, []);
 
   // Lấy danh sách kế hoạch và đơn vị
   const fetchKeHoachs = useCallback(async () => {
-    console.log('fetchKeHoachs called');
     try {
       setLoading(true);
       const [keHoachs, donVis] = await Promise.all([getKeHoachs(), getDonVis()]);
@@ -47,7 +44,6 @@ export const useKeHoach = () => {
       setFilteredKeHoachList(sortedKeHoachs);
       setDonViList(donVis);
     } catch (error) {
-      console.error('Error fetching kế hoạch:', error);
     } finally {
       setLoading(false);
     }
@@ -55,13 +51,10 @@ export const useKeHoach = () => {
 
   // Lấy danh sách kế hoạch bị xóa mềm
   const fetchDeletedKeHoachs = useCallback(async () => {
-    console.log('fetchDeletedKeHoachs called');
     try {
       const deletedKeHoachs = await getDeletedKeHoachs();
-      console.log('getDeletedKeHoachs response:', deletedKeHoachs);
       setDeletedKeHoachList(deletedKeHoachs);
     } catch (error) {
-      console.error('Error fetching deleted kế hoạch:', error);
     }
   }, []);
 
@@ -111,7 +104,6 @@ export const useKeHoach = () => {
       fetchKeHoachs();
       return result;
     } catch (error) {
-      console.error('Error saving kế hoạch:', error);
       throw error;
     }
   };
@@ -127,7 +119,6 @@ export const useKeHoach = () => {
       fetchKeHoachs();
       fetchDeletedKeHoachs();
     } catch (error) {
-      console.error('Error deleting kế hoạch:', error);
     }
   };
 
@@ -138,7 +129,6 @@ export const useKeHoach = () => {
       fetchDeletedKeHoachs();
       addToast('Xóa thành công!', 'success');
     } catch (error) {
-      console.error('Error permanently deleting kế hoạch:', error);
     }
   };
 
@@ -150,7 +140,6 @@ export const useKeHoach = () => {
       fetchKeHoachs();
       addToast('Khôi phục thành công!', 'success');
     } catch (error) {
-      console.error('Error restoring kế hoạch:', error);
     }
   };
 

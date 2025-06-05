@@ -7,7 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, 
+  withCredentials: true,
 });
 
 export async function apiFetch<T = unknown>(
@@ -25,11 +25,22 @@ export async function apiFetch<T = unknown>(
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<LoginError>;
-    if (axiosError.response?.status === 403) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/403';
+    if (typeof window !== 'undefined' && axiosError.response?.status) {
+      const statusCode = axiosError.response.status;
+      switch (statusCode) {
+        case 401: // Unauthorized
+          window.location.href = '/Unauthorized';
+          throw new Error('Bạn cần đăng nhập để truy cập');
+        case 403: // Forbidden
+          window.location.href = '/Forbidden';
+          throw new Error('Bạn không có quyền truy cập');
+        case 404: // Not Found - Có thể xảy ra nếu endpoint không tồn tại
+          window.location.href = '/NotFound';
+          throw new Error('Không tìm thấy tài nguyên');
+        default:
+          // Xử lý các lỗi khác nếu cần, hoặc ném lỗi mặc định
+          throw new Error(axiosError.response?.data?.message || `Lỗi không xác định: ${statusCode}`);
       }
-      throw new Error('Bạn không có quyền truy cập');
     }
     throw new Error(axiosError.response?.data?.message || 'Lỗi không xác định');
   }
@@ -50,11 +61,21 @@ export async function fetchApiNoToken<T = unknown>(
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<LoginError>;
-    if (axiosError.response?.status === 403) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/403';
+    if (typeof window !== 'undefined' && axiosError.response?.status) {
+      const statusCode = axiosError.response.status;
+      switch (statusCode) {
+        case 401: // Unauthorized
+          window.location.href = '/Unauthorized';
+          throw new Error('Bạn cần đăng nhập để truy cập');
+        case 403: // Forbidden
+          window.location.href = '/Forbidden';
+          throw new Error('Bạn không có quyền truy cập');
+        case 404: // Not Found - Có thể xảy ra nếu endpoint không tồn tại
+          window.location.href = '/NotFound';
+          throw new Error('Không tìm thấy tài nguyên');
+        default:
+          throw new Error(axiosError.response?.data?.message || `Lỗi không xác định: ${statusCode}`);
       }
-      throw new Error('Bạn không có quyền truy cập');
     }
     throw new Error(axiosError.response?.data?.message || 'Lỗi không xác định');
   }
@@ -73,6 +94,22 @@ export async function uploadFile(file: File): Promise<{ fileName: string; url: s
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<LoginError>;
+    if (typeof window !== 'undefined' && axiosError.response?.status) {
+        const statusCode = axiosError.response.status;
+        switch (statusCode) {
+            case 401:
+                window.location.href = '/Unauthorized';
+                throw new Error('Bạn cần đăng nhập để upload file');
+            case 403:
+                window.location.href = '/Forbidden';
+                throw new Error('Bạn không có quyền upload file');
+            case 404: // Endpoint upload file không tồn tại
+                window.location.href = '/NotFound';
+                throw new Error('Không tìm thấy dịch vụ upload file');
+            default:
+                throw new Error(axiosError.response?.data?.message || 'Lỗi khi upload file');
+        }
+    }
     throw new Error(axiosError.response?.data?.message || 'Lỗi khi upload file');
   }
 }
@@ -86,4 +123,3 @@ export async function getAllRoles(): Promise<Roles[]> {
 export async function getUserInfo(): Promise<{ userId: string; role: string; username: string }> {
   return apiFetch('/auth/user', { method: 'GET' });
 }
-

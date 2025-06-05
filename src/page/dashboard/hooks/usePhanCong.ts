@@ -30,7 +30,6 @@ export const usePhanCong = () => {
       const userInfo = await getUserInfo();
       setUserRole(userInfo.role);
     } catch (error) {
-      console.error('Error fetching user info:', error);
     }
   }, []);
 
@@ -64,7 +63,6 @@ export const usePhanCong = () => {
       setFilteredPhanCongList(sortedPhanCongs);
       setNguoiDungList(nguoiDungs);
     } catch (error) {
-      console.error('Error fetching phan cong data:', error);
       addToast('Lỗi khi tải dữ liệu phân công', 'error');
     } finally {
       setLoading(false);
@@ -141,7 +139,6 @@ export const usePhanCong = () => {
       }
       fetchPhanCongData();
     } catch (error) {
-      console.error(`Error saving phan cong (${mode}):`, error);
       addToast(`Lỗi khi ${mode === 'create' ? 'tạo' : 'cập nhật'} phân công`, 'error');
       throw error;
     } finally {
@@ -161,7 +158,6 @@ export const usePhanCong = () => {
       addToast('Xóa phân công thành công', 'success');
       fetchPhanCongData();
     } catch (error) {
-      console.error('Error deleting phan cong:', error);
       addToast('Lỗi khi xóa phân công', 'error');
     } finally {
       setLoading(false);

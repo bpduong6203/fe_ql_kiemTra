@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils'; 
+import { cn } from '@/lib/utils';
 
 interface ErrorPageProps {
-  statusCode: 401 | 403 | 404 | 500 | string; 
+  statusCode: 401 | 403 | 404 | 500 | string;
   title: string;
   message: string;
   description?: string;
-  imageSrc: string;
-  imageAlt: string;
+  customImageRenderer: React.ReactNode; 
   buttonText: string;
   buttonLink: string;
   showCode?: boolean;
@@ -18,16 +17,14 @@ export default function ErrorPage({
   title,
   message,
   description,
-  imageSrc,
-  imageAlt,
   buttonText,
+  customImageRenderer, 
   buttonLink,
   showCode = true,
 }: ErrorPageProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 text-foreground">
       <div className="container max-w-6xl flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
-        {/* Left side with title and text */}
         <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
           {showCode && (
             <h1 className="text-6xl md:text-8xl font-extrabold text-blue-600 dark:text-blue-400 mb-4 animate-fade-in-up">
@@ -55,14 +52,11 @@ export default function ErrorPage({
           </Link>
         </div>
 
-        {/* Right side with image */}
         <div className="md:w-1/2 flex justify-center px-4 md:px-0">
           <div className="relative w-full max-w-md h-auto">
-            <img
-              src={imageSrc}
-              alt={imageAlt}
-              className="w-full h-auto object-contain rounded-lg shadow-xl"
-            />
+            <div className="w-full h-auto object-contain rounded-lg shadow-xl">
+              {customImageRenderer}
+            </div>
           </div>
         </div>
       </div>

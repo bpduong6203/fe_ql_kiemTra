@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/components/toast-provider';
-import { uploadFile } from '@/lib/api'; 
+import { uploadFile, getUserInfo } from '@/lib/api';
 import { 
     getNDGiaiTrinhsByGiaiTrinhId, 
     createNDGiaiTrinh, 
@@ -17,18 +17,31 @@ interface NDGiaiTrinhPayload {
     linkFile?: string;
     nguoiDanhGiaID?: string;
     trangThai?: 'Chờ Đánh Giá' | 'Đạt' | 'Chưa Đạt' | 'Đã Sửa';
-  }
+}
   
 interface DanhGiaNDGiaiTrinhPayload {
     trangThai: 'Đạt' | 'Chưa Đạt'; 
 }
 
-export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: string | null) => {
+export const useNDGiaiTrinh = (giaiTrinhId: string | null) => {
     const [ndGiaiTrinhList, setNdGiaiTrinhList] = useState<NDGiaiTrinh[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const { addToast } = useToast();
 
     const [selectedNDFile, setSelectedNDFile] = useState<File | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [currentUsername, setCurrentUsername] = useState<string | null>(null);
+
+    const fetchUserInfo = useCallback(async () => {
+        try {
+            const userInfo = await getUserInfo();
+            setUserRole(userInfo.role);
+            setCurrentUsername(userInfo.username);
+        } catch (error) {
+            setUserRole(null);
+            setCurrentUsername(null);
+        }
+    }, []);
 
     const fetchNDGiaiTrinhs = useCallback(async () => {
         if (!giaiTrinhId) {
@@ -44,7 +57,6 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
             if (error.response && error.response.status === 404) {
                 setNdGiaiTrinhList([]);
             } else {
-                console.error("Lỗi khi tải nội dung giải trình:", error); 
                 addToast("Lỗi khi tải nội dung giải trình", "error"); 
                 setNdGiaiTrinhList([]);
             }
@@ -54,8 +66,9 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
     }, [giaiTrinhId, addToast]);
 
     useEffect(() => {
+        fetchUserInfo(); 
         fetchNDGiaiTrinhs();
-    }, [fetchNDGiaiTrinhs]);
+    }, [fetchUserInfo, fetchNDGiaiTrinhs]); 
 
     const handleNDFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -92,27 +105,42 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
         setLoading(true);
         let linkFile: string | undefined = undefined;
         let tenFile: string | undefined = undefined;
+        let newTrangThai: 'Chờ Đánh Giá' | 'Đạt' | 'Chưa Đạt' | 'Đã Sửa' | undefined = undefined;
 
         try {
+            const existingNDGiaiTrinh = ndGiaiTrinhList.find(nd => nd.id === ndGiaiTrinhId);
+
             if (selectedNDFile) {
                 const uploadResult = await uploadFile(selectedNDFile);
                 linkFile = uploadResult.url;
                 tenFile = selectedNDFile.name;
+
+                if (existingNDGiaiTrinh?.trangThai === 'Chưa Đạt') {
+                    newTrangThai = 'Đã Sửa';
+                }
+            } else if (existingNDGiaiTrinh) {
+                linkFile = existingNDGiaiTrinh.linkFile;
+                tenFile = existingNDGiaiTrinh.tenFile;
             }
+            
+            if (existingNDGiaiTrinh?.trangThai === 'Chưa Đạt' && data.NoiDung !== existingNDGiaiTrinh.noiDung && !selectedNDFile) {
+                newTrangThai = 'Đã Sửa';
+            }
+
+            if (newTrangThai === undefined && existingNDGiaiTrinh) {
+                newTrangThai = existingNDGiaiTrinh.trangThai as 'Chờ Đánh Giá' | 'Đạt' | 'Chưa Đạt' | 'Đã Sửa';
+            }
+
 
             const payload: NDGiaiTrinhPayload = {
                 giaiTrinhID: data.GiaiTrinhID,
                 noiDung: data.NoiDung,
                 linkFile: linkFile,
                 tenFile: tenFile,
+                trangThai: newTrangThai,
             };
 
             if (ndGiaiTrinhId) { 
-                const existingNDGiaiTrinh = ndGiaiTrinhList.find(nd => nd.id === ndGiaiTrinhId);
-                if (!selectedNDFile && existingNDGiaiTrinh) {
-                    payload.linkFile = existingNDGiaiTrinh.linkFile;
-                    payload.tenFile = existingNDGiaiTrinh.tenFile;
-                }
                 await updateNDGiaiTrinh(ndGiaiTrinhId, payload);
                 addToast("Cập nhật nội dung giải trình thành công!", "success");
             } else { 
@@ -121,6 +149,7 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
                      setLoading(false);
                      return;
                 }
+                payload.trangThai = 'Chờ Đánh Giá';
                 await createNDGiaiTrinh(payload);
                 addToast("Thêm nội dung giải trình thành công!", "success");
             }
@@ -128,7 +157,6 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
             setSelectedNDFile(null); 
             await fetchNDGiaiTrinhs();
         } catch (error) {
-            console.error("Lỗi khi lưu nội dung giải trình:", error); 
             addToast("Lỗi khi lưu nội dung giải trình", "error");
             throw error;
         } finally {
@@ -143,7 +171,6 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
             addToast("Xóa nội dung giải trình thành công!", "success");
             await fetchNDGiaiTrinhs();
         } catch (error) {
-            console.error("Lỗi khi xóa nội dung giải trình:", error); 
             addToast("Lỗi khi xóa nội dung giải trình", "error");
         } finally {
             setLoading(false);
@@ -163,12 +190,20 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
             addToast(`Đã đánh giá nội dung giải trình: ${trangThai}`, "success");
             await fetchNDGiaiTrinhs();
         } catch (error) {
-            console.error("Lỗi khi đánh giá nội dung giải trình:", error); 
             addToast("Lỗi khi đánh giá nội dung giải trình", "error");
         } finally {
             setLoading(false);
         }
     };
+
+    const canManipulateND = useCallback((ndGiaiTrinh: NDGiaiTrinh) => {
+        const isGiaiTrinhExplainer = ndGiaiTrinh.giaiTrinh?.nguoiGiaiTrinh?.username === currentUsername;
+        const canExplainerManipulate = isGiaiTrinhExplainer && (userRole === 'DonVi' || userRole === 'ThanhVien');
+        const hasOverallEditPermission = userRole === 'TruongDoan';
+
+        return canExplainerManipulate || hasOverallEditPermission; 
+    }, [currentUsername, userRole]);
+
 
     return {
         ndGiaiTrinhList,
@@ -180,5 +215,6 @@ export const useNDGiaiTrinh = (giaiTrinhId: string | null | null, userRole: stri
         handleSaveNDGiaiTrinh,
         handleDeleteNDGiaiTrinh,
         handleDanhGiaNDGiaiTrinh,
+        canManipulateND, 
     };
 };
