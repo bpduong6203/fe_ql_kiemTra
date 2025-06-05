@@ -1,12 +1,11 @@
 import React, { lazy, Suspense } from 'react';
-import loading1 from '@/assets/Animation - 1747880950855.json';
-import loading2 from '@/assets/Animation - 1748074983693.json';
-import loading3 from '@/assets/Animation - 1744082020798.json';
+import loading1 from '@/assets/Animation - 1748074983693.json';
+import loading2 from '@/assets/Animation - 1749109042086.json';
 
 const Player = lazy(() => import('lottie-react'));
 
 interface LoadingSpinnerProps {
-  variant?: 1 | 2 | 3;
+  variant?: 1 | 2 ;
   withOverlay?: boolean;
   className?: string;
 }
@@ -21,7 +20,6 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const animations = {
     1: loading1,
     2: loading2,
-    3: loading3,
   };
 
   const spinner = (

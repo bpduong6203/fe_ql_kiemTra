@@ -70,7 +70,7 @@ export const NDGiaiTrinhFormModal: React.FC<NDGiaiTrinhFormModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
-        {loading && <LoadingSpinner withOverlay={true} variant={1} />}
+        {loading && <LoadingSpinner withOverlay={true} variant={2} />}
         <DialogHeader>
           <DialogTitle>{isCreateMode ? 'Thêm Nội Dung Giải Trình Mới' : 'Chi Tiết Nội Dung Giải Trình'}</DialogTitle>
           <DialogDescription>
