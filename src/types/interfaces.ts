@@ -144,6 +144,7 @@ export interface NDGiaiTrinh {
   nguoiDanhGiaID?: string; 
   ngayDanhGia?: string; 
   nguoiDanhGia?: NguoiDungSelectedInfo; 
+  giaiTrinh?: GiaiTrinh;
 }
 
 export interface NDGiaiTrinhPayload {
@@ -152,8 +153,9 @@ export interface NDGiaiTrinhPayload {
   tenFile?: string;
   linkFile?: string;
   nguoiDanhGiaID?: string;
+  trangThai?: 'Chờ Đánh Giá' | 'Đạt' | 'Chưa Đạt' | 'Đã Sửa';
 }
 
 export interface DanhGiaNDGiaiTrinhPayload {
-  trangThai: 'Đạt' | 'Chưa Đạt'; 
+  trangThai: 'Đạt' | 'Chưa Đạt' | 'Đã Sửa'; 
 }

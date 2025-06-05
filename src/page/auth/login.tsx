@@ -10,9 +10,7 @@ const Login = () => {
     document.title = "Đăng nhập - Hệ thống quản lý";
   }, []);  
 
-  const handleLogin = (email: string, password: string) => {
-    console.log("Email:", email);
-    console.log("Password:", password);
+  const handleLogin = () => {
   };
 
   return (

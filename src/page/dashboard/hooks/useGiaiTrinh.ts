@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  getGiaiTrinhs,
-  updateGiaiTrinh,
-  deleteGiaiTrinh,
-  createGiaiTrinh,
-  type GiaiTrinhPayload, 
-} from '@/lib/apiGiaiTrinh'; 
-import { getUserInfo, uploadFile } from '@/lib/api';
 import { useToast } from '@/components/toast-provider';
+import { uploadFile, getUserInfo } from '@/lib/api'; 
+import { 
+    getGiaiTrinhs, 
+    updateGiaiTrinh, 
+    deleteGiaiTrinh, 
+    createGiaiTrinh, 
+    type GiaiTrinhPayload, 
+} from '@/lib/apiGiaiTrinh'; 
 import { useSelectedPlan } from '@/context/SelectedPlanContext';
 import { getAllUsers } from '@/lib/apiuser';
 import type { GiaiTrinh, NguoiDung } from '@/types/interfaces'; 
@@ -18,6 +18,7 @@ export const useGiaiTrinh = () => {
   const [nguoiDungList, setNguoiDungList] = useState<NguoiDung[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
 
   const [selectedLocalFiles, setSelectedLocalFiles] = useState<File[]>([]);
 
@@ -26,10 +27,13 @@ export const useGiaiTrinh = () => {
 
   const fetchUserInfo = useCallback(async () => {
     try {
-      const userInfo = await getUserInfo();
+      const userInfo = await getUserInfo(); 
       setUserRole(userInfo.role);
+      setCurrentUsername(userInfo.username);
     } catch (error) {
       console.error('Lỗi khi tải thông tin người dùng:', error);
+      setUserRole(null);
+      setCurrentUsername(null);
     }
   }, []);
 
@@ -90,7 +94,7 @@ export const useGiaiTrinh = () => {
       nguoiGiaiTrinhID: string;
       trangThaiTongThe?: string;
     },
-    currentGiaiTrinhId: string | null 
+    currentGiaiTrinhId: string | null
   ) => {
     if (!selectedPlan?.id) {
       addToast('Vui lòng chọn một kế hoạch.', 'error');
@@ -118,7 +122,7 @@ export const useGiaiTrinh = () => {
             const newGiaiTrinhResponse = await createGiaiTrinh(createPayload); 
             idOfGiaiTrinhToAttachFiles = newGiaiTrinhResponse.id; 
             addToast('Yêu cầu giải trình đã được tạo thành công!', 'success');
-        } else {
+        } else { 
             const updatePayload: GiaiTrinhPayload = {
                 keHoachID: data.keHoachID, 
                 nguoiGiaiTrinhID: data.nguoiGiaiTrinhID,
@@ -154,19 +158,18 @@ export const useGiaiTrinh = () => {
   const handleCompleteGiaiTrinh = async (giaiTrinhId: string) => {
     setLoading(true);
     try {
-        if (!canEditGiaiTrinh) { 
+        if (!canEditGiaiTrinh) {
             addToast('Bạn không có quyền hoàn thành giải trình', 'error');
             throw new Error('Không đủ quyền hạn');
         }
-
         await updateGiaiTrinh(giaiTrinhId, {
-            keHoachID: giaiTrinh?.keHoachID || '', 
-            nguoiGiaiTrinhID: giaiTrinh?.nguoiGiaiTrinhID || '', 
+            keHoachID: giaiTrinh?.keHoachID || '',
+            nguoiGiaiTrinhID: giaiTrinh?.nguoiGiaiTrinhID || '',
             trangThaiTongThe: 'Đã Giải Trình'
         });
         
         addToast('Giải trình đã được đánh dấu hoàn thành!', 'success');
-        await fetchGiaiTrinhForSelectedPlan(); 
+        await fetchGiaiTrinhForSelectedPlan();
     } catch (error) {
         console.error('Lỗi khi hoàn thành giải trình:', error);
         addToast('Lỗi khi hoàn thành giải trình', 'error');
@@ -174,7 +177,6 @@ export const useGiaiTrinh = () => {
         setLoading(false);
     }
   };
-
 
   const handleDeleteGiaiTrinh = async (id: string) => {
     setLoading(true);
@@ -215,11 +217,14 @@ export const useGiaiTrinh = () => {
   const canUploadGiaiTrinhFile = userRole === 'TruongDoan' || userRole === 'ThanhVien';
   const canDeleteGiaiTrinhFile = userRole === 'TruongDoan' || userRole === 'ThanhVien';
 
+  const canAddNDGiaiTrinh = (giaiTrinh?.nguoiGiaiTrinh?.username === currentUsername && (userRole === 'DonVi' || userRole === 'ThanhVien')) || (userRole === 'TruongDoan');
+  
   return {
     giaiTrinh,
     nguoiDungList,
     loading,
     userRole,
+    currentUsername,
     fetchGiaiTrinhForSelectedPlan,
     handleSaveGiaiTrinh,
     handleDeleteGiaiTrinh,
@@ -236,5 +241,6 @@ export const useGiaiTrinh = () => {
     setSelectedLocalFiles,
     handleLocalFilesChange,
     handleRemoveLocalFile,
+    canAddNDGiaiTrinh,
   };
 };

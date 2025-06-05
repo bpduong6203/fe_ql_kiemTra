@@ -83,7 +83,7 @@ export async function getAllRoles(): Promise<Roles[]> {
 }
 
 // Get user info
-export async function getUserInfo(): Promise<{ userId: string; role: string }> {
+export async function getUserInfo(): Promise<{ userId: string; role: string; username: string }> {
   return apiFetch('/auth/user', { method: 'GET' });
 }
 

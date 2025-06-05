@@ -26,7 +26,6 @@ export const PhanCongViewModal: React.FC<PhanCongViewModalProps> = ({
   if (!isOpen || !selectedPhanCong) return null;
 
   const fields = [
-    { label: 'ID', value: selectedPhanCong.id },
     { label: 'Người dùng', value: `${selectedPhanCong.nguoiDung.hoTen} (${selectedPhanCong.nguoiDung.username})` },
     { label: 'Kế hoạch', value: selectedPhanCong.keHoach.tenKeHoach },
     { label: 'Nội dung công việc', value: selectedPhanCong.noiDungCV, multiline: true },

@@ -14,7 +14,6 @@ import {
 import { type NavItem } from '@/types';
 import {
   BookOpen,
-  Calendar,
   CheckCircle,
   ClipboardList,
   Folder,
@@ -24,6 +23,8 @@ import {
   Users,
   Building,
   LogIn,
+  Eye,          
+  ClipboardEdit,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Link } from 'react-router-dom';
@@ -36,13 +37,14 @@ const mainNavItems: NavItem[] = [
     icon: LayoutGrid,
   },
   {
-    title: 'Kế hoạch',
-    url: '#',
-    icon: Calendar,
-    items: [
-      { title: 'Lập kế hoạch', url: '/ke_hoach' },
-      { title: 'Xem kế hoạch', url: '/chi_tiet_ke_hoach' },
-    ],
+    title: 'Lập kế hoạch',
+    url: '/ke_hoach',
+    icon: ClipboardEdit,
+  },
+  {
+    title: 'Xem kế hoạch',
+    url: '/chi_tiet_ke_hoach',
+    icon: Eye,
   },
   {
     title: 'Phân công',

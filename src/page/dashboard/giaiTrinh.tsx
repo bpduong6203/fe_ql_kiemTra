@@ -1,15 +1,19 @@
-// src/pages/giai-trinh/index.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import HeadingSmall from '@/components/heading-small';
 import { useToast } from '@/components/toast-provider';
 import { useGiaiTrinh } from './hooks/useGiaiTrinh';
+import { useNDGiaiTrinh } from './hooks/useNDGiaiTrinh';
 import { GiaiTrinhFormModal } from './components/giaiTrinh-manager/GiaiTrinhFormModal';
+import { NDGiaiTrinhTable } from './components/giaiTrinh-manager/NDGiaiTrinhTable';
+import { NDGiaiTrinhFormModal } from './components/giaiTrinh-manager/NDGiaiTrinhFormModal';
 import { Button } from '@/components/ui/button';
-import { Edit, PlusIcon, Trash2, FileTextIcon, DownloadIcon, CheckCircle } from 'lucide-react';
+import { Edit, PlusIcon, Trash2, FileTextIcon, DownloadIcon, CheckCircle, MessageSquarePlus } from 'lucide-react';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { NDGiaiTrinh } from '@/types/interfaces';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -25,6 +29,15 @@ type GiaiTrinhForm = {
 };
 
 export default function GiaiTrinhPage() {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+  const getDownloadUrl = (linkFile: string) => {
+    if (linkFile.startsWith('https://') || linkFile.startsWith('http://')) {
+      return linkFile;
+    }
+    return `${baseUrl}${linkFile.startsWith('/') ? '' : '/'}${linkFile}`;
+  };
+
   const {
     giaiTrinh,
     nguoiDungList,
@@ -39,6 +52,8 @@ export default function GiaiTrinhPage() {
     canUploadGiaiTrinhFile,
     canDeleteGiaiTrinhFile,
     selectedPlan,
+    currentUsername,
+    canAddNDGiaiTrinh,
 
     selectedLocalFiles,
     setSelectedLocalFiles,
@@ -46,10 +61,25 @@ export default function GiaiTrinhPage() {
     handleRemoveLocalFile,
   } = useGiaiTrinh();
 
+  const {
+    ndGiaiTrinhList,
+    loading: ndLoading,
+    selectedNDFile,
+    handleNDFileChange,
+    handleRemoveNDFile,
+    handleSaveNDGiaiTrinh,
+    handleDeleteNDGiaiTrinh,
+    handleDanhGiaNDGiaiTrinh,
+  } = useNDGiaiTrinh(giaiTrinh?.id || null, currentUsername);
+
   const { addToast } = useToast();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGiaiTrinhModalOpen, setIsGiaiTrinhModalOpen] = useState(false);
+  const [isNDGiaiTrinhModalOpen, setIsNDGiaiTrinhModalOpen] = useState(false);
+  const [currentNDGiaiTrinh, setCurrentNDGiaiTrinh] = useState<NDGiaiTrinh | null>(null);
   const [formData, setFormData] = useState<Partial<GiaiTrinhForm>>({});
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [selectedGiaiTrinhId, setSelectedGiaiTrinhId] = useState<string | null>(null);
 
   useEffect(() => {
     if (giaiTrinh) {
@@ -73,8 +103,26 @@ export default function GiaiTrinhPage() {
         addToast('Vui lòng chọn một Kế hoạch để quản lý Giải Trình.', 'error');
         return;
     }
-    setIsModalOpen(true);
+    setIsGiaiTrinhModalOpen(true);
   }, [selectedPlan, addToast]);
+
+  const handleOpenCreateNDGiaiTrinhModal = useCallback(() => {
+    if (!giaiTrinh?.id) {
+        addToast('Vui lòng tạo Giải Trình trước khi thêm nội dung giải trình.', 'error');
+        return;
+    }
+    if (!canAddNDGiaiTrinh) { 
+        addToast('Bạn không có quyền thêm nội dung giải trình.', 'error');
+        return;
+    }
+    setCurrentNDGiaiTrinh(null);
+    setIsNDGiaiTrinhModalOpen(true);
+  }, [giaiTrinh, addToast, canAddNDGiaiTrinh]);
+
+  const handleOpenViewNDGiaiTrinhModal = useCallback((ndGiaiTrinh: NDGiaiTrinh) => {
+    setCurrentNDGiaiTrinh(ndGiaiTrinh);
+    setIsNDGiaiTrinhModalOpen(true);
+  }, []); 
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -104,15 +152,34 @@ export default function GiaiTrinhPage() {
             },
             giaiTrinh ? giaiTrinh.id : null
         );
-        setIsModalOpen(false);
+        setIsGiaiTrinhModalOpen(false);
     } catch (error) {
       // Lỗi đã được xử lý trong hook, không cần làm gì thêm ở đây
     }
   };
 
+  const onSubmitNDGiaiTrinhForm = async (data: { NoiDung: string; GiaiTrinhID: string; }, ndGiaiTrinhId: string | null) => {
+    try {
+      await handleSaveNDGiaiTrinh(data, ndGiaiTrinhId);
+      setIsNDGiaiTrinhModalOpen(false);
+    } catch (error) {
+      // Lỗi đã được xử lý trong hook
+    }
+  };
+
+
   const handleDownloadFile = (linkFile: string, fileName: string) => {
-    window.open(linkFile, '_blank');
+    const fullUrl = getDownloadUrl(linkFile);
+    window.open(fullUrl, '_blank');
     addToast(`Đang tải xuống: ${fileName}`, 'info');
+  };
+
+  const confirmDelete = () => {
+    if (selectedGiaiTrinhId) {
+      handleDeleteGiaiTrinh(selectedGiaiTrinhId);
+      setAlertOpen(false);
+      setSelectedGiaiTrinhId(null);
+    }
   };
 
   return (
@@ -125,24 +192,23 @@ export default function GiaiTrinhPage() {
                 Vui lòng chọn một Kế hoạch từ danh sách để quản lý Giải Trình.
             </div>
         ) : loading ? (
-            // Thay thế thông báo "Đang tải thông tin Giải Trình..." bằng Skeleton
             <div className="p-4 border rounded-md shadow-sm bg-background space-y-4">
-              <Skeleton className="h-6 w-3/4" /> {/* Tiêu đề Skeleton */}
+              <Skeleton className="h-6 w-3/4" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Skeleton className="h-5 w-30 mb-2" /> 
+                  <Skeleton className="h-5 w-30 mb-2" />
                   <Skeleton className="h-5 w-full" />
                 </div>
                 <div>
-                  <Skeleton className="h-5 w-30 mb-2" /> 
+                  <Skeleton className="h-5 w-30 mb-2" />
                   <Skeleton className="h-5 w-full" />
                 </div>
                 <div>
-                  <Skeleton className="h-5 w-30 mb-2" /> 
+                  <Skeleton className="h-5 w-30 mb-2" />
                   <Skeleton className="h-5 w-full" />
                 </div>
                 <div>
-                  <Skeleton className="h-5 w-30 mb-2" /> 
+                  <Skeleton className="h-5 w-30 mb-2" />
                   <Skeleton className="h-5 w-full" />
                 </div>
               </div>
@@ -152,7 +218,7 @@ export default function GiaiTrinhPage() {
                 <Skeleton className="h-8 w-full" />
               </div>
               <div className="flex justify-end gap-2 mt-4">
-                <Skeleton className="h-9 w-32" /> 
+                <Skeleton className="h-9 w-32" />
                 <Skeleton className="h-9 w-32" />
               </div>
             </div>
@@ -227,6 +293,30 @@ export default function GiaiTrinhPage() {
                                 </Button>
                             )}
                         </div>
+
+                        {/* Phần hiển thị và quản lý Nội dung Giải Trình (NDGiaiTrinh) */}
+                        <div className="mt-6">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold">Nội dung Giải Trình</h4>
+                                {canAddNDGiaiTrinh && (
+                                    <Button size="sm" onClick={handleOpenCreateNDGiaiTrinhModal}>
+                                        <MessageSquarePlus className="mr-2 size-4" /> Thêm Nội dung
+                                    </Button>
+                                )}
+                            </div>
+                            <NDGiaiTrinhTable
+                                ndGiaiTrinhList={ndGiaiTrinhList}
+                                loading={ndLoading}
+                                canEvaluate={canEditGiaiTrinh} 
+                                canDeleteND={canDeleteGiaiTrinh}
+                                onDeleteND={handleDeleteNDGiaiTrinh}
+                                onEvaluateND={handleDanhGiaNDGiaiTrinh}
+                                onViewND={handleOpenViewNDGiaiTrinhModal}
+                                getDownloadUrl={getDownloadUrl}
+                                canManipulateND={canAddNDGiaiTrinh}
+                            />
+                        </div>
+
                     </div>
                 ) : (
                     <div className="p-4 text-center text-muted-foreground border rounded-md">
@@ -242,9 +332,9 @@ export default function GiaiTrinhPage() {
         )}
 
         <GiaiTrinhFormModal
-          isOpen={isModalOpen}
+          isOpen={isGiaiTrinhModalOpen}
           onClose={() => {
-            setIsModalOpen(false);
+            setIsGiaiTrinhModalOpen(false);
             setSelectedLocalFiles([]);
           }}
           currentGiaiTrinh={giaiTrinh}
@@ -263,7 +353,48 @@ export default function GiaiTrinhPage() {
           formData={formData}
           loading={loading}
         />
+
+        {giaiTrinh?.id && (
+            <NDGiaiTrinhFormModal
+                isOpen={isNDGiaiTrinhModalOpen}
+                onClose={() => {
+                    setIsNDGiaiTrinhModalOpen(false);
+                    setCurrentNDGiaiTrinh(null);
+                    handleRemoveNDFile();
+                }}
+                currentNDGiaiTrinh={currentNDGiaiTrinh}
+                giaiTrinhId={giaiTrinh.id}
+                loading={ndLoading}
+                selectedNDFile={selectedNDFile}
+                handleNDFileChange={handleNDFileChange}
+                handleRemoveNDFile={handleRemoveNDFile}
+                onSaveNDGiaiTrinh={onSubmitNDGiaiTrinhForm}
+                getDownloadUrl={getDownloadUrl}
+            />
+        )}
+
       </div>
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold">
+              Xác nhận xóa Giải Trình
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-muted-foreground">
+              Bạn có chắc chắn muốn xóa giải trình này? Hành động này không thể hoàn tác và các tệp đính kèm sẽ bị xóa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="px-4 py-2">Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+            >
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
