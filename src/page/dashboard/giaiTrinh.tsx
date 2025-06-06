@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { NDGiaiTrinh } from '@/types/interfaces';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -23,9 +24,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type GiaiTrinhForm = {
-    keHoachID: string;
-    nguoiGiaiTrinhID: string;
-    trangThaiTongThe?: string;
+  keHoachID: string;
+  nguoiGiaiTrinhID: string;
+  trangThaiTongThe?: string;
 };
 
 export default function GiaiTrinhPage() {
@@ -99,20 +100,20 @@ export default function GiaiTrinhPage() {
 
   const handleOpenGiaiTrinhModal = useCallback(() => {
     if (!selectedPlan?.id) {
-        addToast('Vui lòng chọn một Kế hoạch để quản lý Giải Trình.', 'error');
-        return;
+      addToast('Vui lòng chọn một Kế hoạch để quản lý Giải Trình.', 'error');
+      return;
     }
     setIsGiaiTrinhModalOpen(true);
   }, [selectedPlan, addToast]);
 
   const handleOpenCreateNDGiaiTrinhModal = useCallback(() => {
     if (!giaiTrinh?.id) {
-        addToast('Vui lòng tạo Giải Trình trước khi thêm nội dung giải trình.', 'error');
-        return;
+      addToast('Vui lòng tạo Giải Trình trước khi thêm nội dung giải trình.', 'error');
+      return;
     }
-    if (!canAddNDGiaiTrinh) { 
-        addToast('Bạn không có quyền thêm nội dung giải trình.', 'error');
-        return;
+    if (!canAddNDGiaiTrinh) {
+      addToast('Bạn không có quyền thêm nội dung giải trình.', 'error');
+      return;
     }
     setCurrentNDGiaiTrinh(null);
     setIsNDGiaiTrinhModalOpen(true);
@@ -121,7 +122,7 @@ export default function GiaiTrinhPage() {
   const handleOpenViewNDGiaiTrinhModal = useCallback((ndGiaiTrinh: NDGiaiTrinh) => {
     setCurrentNDGiaiTrinh(ndGiaiTrinh);
     setIsNDGiaiTrinhModalOpen(true);
-  }, []); 
+  }, []);
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -138,20 +139,20 @@ export default function GiaiTrinhPage() {
       return;
     }
     if (giaiTrinh === null && selectedLocalFiles.length === 0) {
-        addToast('Vui lòng chọn ít nhất một tệp để tạo yêu cầu Giải Trình.', 'error');
-        return;
+      addToast('Vui lòng chọn ít nhất một tệp để tạo yêu cầu Giải Trình.', 'error');
+      return;
     }
 
     try {
-        await handleSaveGiaiTrinh(
-            {
-                keHoachID: selectedPlan.id,
-                nguoiGiaiTrinhID: formData.nguoiGiaiTrinhID,
-                trangThaiTongThe: formData.trangThaiTongThe,
-            },
-            giaiTrinh ? giaiTrinh.id : null
-        );
-        setIsGiaiTrinhModalOpen(false);
+      await handleSaveGiaiTrinh(
+        {
+          keHoachID: selectedPlan.id,
+          nguoiGiaiTrinhID: formData.nguoiGiaiTrinhID,
+          trangThaiTongThe: formData.trangThaiTongThe,
+        },
+        giaiTrinh ? giaiTrinh.id : null
+      );
+      setIsGiaiTrinhModalOpen(false);
     } catch (error) {
       // Lỗi đã được xử lý trong hook, không cần làm gì thêm ở đây
     }
@@ -181,153 +182,182 @@ export default function GiaiTrinhPage() {
     }
   };
 
+  const handleOpenDeleteConfirm = (giaiTrinhId: string) => {
+    setSelectedGiaiTrinhId(giaiTrinhId);
+    setAlertOpen(true);
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div className="space-y-6 p-4">
         <HeadingSmall title="Quản lý Giải Trình" description="Theo dõi và quản lý các yêu cầu giải trình cho kế hoạch đã chọn" />
 
         {!selectedPlan?.id ? (
-            <div className="p-4 text-center text-muted-foreground border rounded-md">
-                Vui lòng chọn một Kế hoạch từ danh sách để quản lý Giải Trình.
-            </div>
+          <div className="p-4 text-center text-muted-foreground border rounded-md">
+            Vui lòng chọn một Kế hoạch từ danh sách để quản lý Giải Trình.
+          </div>
         ) : loading ? (
-            <div className="p-4 border rounded-md shadow-sm bg-background space-y-4">
-              <Skeleton className="h-6 w-3/4" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Skeleton className="h-5 w-30 mb-2" />
-                  <Skeleton className="h-5 w-full" />
-                </div>
-                <div>
-                  <Skeleton className="h-5 w-30 mb-2" />
-                  <Skeleton className="h-5 w-full" />
-                </div>
-                <div>
-                  <Skeleton className="h-5 w-30 mb-2" />
-                  <Skeleton className="h-5 w-full" />
-                </div>
-                <div>
-                  <Skeleton className="h-5 w-30 mb-2" />
-                  <Skeleton className="h-5 w-full" />
-                </div>
+          <div className="p-4 border rounded-md shadow-sm bg-background space-y-4">
+            <Skeleton className="h-6 w-3/4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Skeleton className="h-5 w-30 mb-2" />
+                <Skeleton className="h-5 w-full" />
               </div>
-              <div className="mt-4 border-t pt-4 space-y-2">
-                <Skeleton className="h-5 w-1/2" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
+              <div>
+                <Skeleton className="h-5 w-30 mb-2" />
+                <Skeleton className="h-5 w-full" />
               </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <Skeleton className="h-9 w-32" />
-                <Skeleton className="h-9 w-32" />
+              <div>
+                <Skeleton className="h-5 w-30 mb-2" />
+                <Skeleton className="h-5 w-full" />
+              </div>
+              <div>
+                <Skeleton className="h-5 w-30 mb-2" />
+                <Skeleton className="h-5 w-full" />
               </div>
             </div>
+            <div className="mt-4 border-t pt-4 space-y-2">
+              <Skeleton className="h-5 w-1/2" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Skeleton className="h-9 w-32" />
+              <Skeleton className="h-9 w-32" />
+            </div>
+          </div>
         ) : (
-            <>
-                {giaiTrinh ? (
-                    <div className="p-4 border rounded-md shadow-sm bg-background">
-                        <h3 className="text-lg font-semibold mb-3">Thông tin Giải Trình cho Kế hoạch: <span className="text-primary">{selectedPlan?.name}</span></h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Người Yêu Cầu:</p>
-                                <p className="font-medium">{giaiTrinh.nguoiYeuCau.hoTen} ({giaiTrinh.nguoiYeuCau.username})</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Người Giải Trình:</p>
-                                <p className="font-medium">{giaiTrinh.nguoiGiaiTrinh.hoTen} ({giaiTrinh.nguoiGiaiTrinh.username})</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Ngày Tạo:</p>
-                                <p className="font-medium">{format(new Date(giaiTrinh.ngayTao), 'dd/MM/yyyy HH:mm')}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-muted-foreground">Trạng Thái:</p>
-                                <p className="font-medium">{giaiTrinh.trangThaiTongThe}</p>
-                            </div>
-                        </div>
+          <>
+            {giaiTrinh ? (
+              <div className="p-4 border rounded-md shadow-sm bg-background">
+                <h3 className="text-lg font-semibold mb-3">Thông tin Giải Trình cho Kế hoạch: <span className="text-primary">{selectedPlan?.name}</span></h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Người Yêu Cầu:</p>
+                    <p className="font-medium">{giaiTrinh.nguoiYeuCau.hoTen} ({giaiTrinh.nguoiYeuCau.username})</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Người Giải Trình:</p>
+                    <p className="font-medium">{giaiTrinh.nguoiGiaiTrinh.hoTen} ({giaiTrinh.nguoiGiaiTrinh.username})</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Ngày Tạo:</p>
+                    <p className="font-medium">{format(new Date(giaiTrinh.ngayTao), 'dd/MM/yyyy HH:mm')}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Trạng Thái:</p>
+                    <p className="font-medium">{giaiTrinh.trangThaiTongThe}</p>
+                  </div>
+                </div>
 
-                        <div className="mt-4 border-t pt-4">
-                            <h4 className="font-semibold text-base mb-2">Tệp đính kèm đã có:</h4>
-                            {giaiTrinh.giaiTrinhFiles.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">Chưa có tệp đính kèm nào.</p>
-                            ) : (
-                            <ul className="space-y-2">
-                                {giaiTrinh.giaiTrinhFiles.map((file) => (
-                                <li key={file.id} className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-2">
-                                    <FileTextIcon className="size-4 text-muted-foreground" />
-                                    <span>{file.tenFile}</span>
-                                    </div>
-                                    <div className="flex gap-1">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleDownloadFile(file.linkFile, file.tenFile)}
-                                    >
-                                        <DownloadIcon className="size-4" />
-                                    </Button>
-                                    </div>
-                                </li>
-                                ))}
-                            </ul>
-                            )}
-                        </div>
-
-                        <div className="flex justify-end gap-2 mt-4">
-                            {canUploadGiaiTrinhFile && (
-                                <Button onClick={handleOpenGiaiTrinhModal}>
-                                    <Edit className="mr-2 size-4" />Quản lý File
-                                </Button>
-                            )}
-                            {giaiTrinh.trangThaiTongThe === 'Chờ Giải Trình' && canEditGiaiTrinh && (
+                <div className="mt-4 border-t pt-4">
+                  <h4 className="font-semibold text-base mb-2">Tệp đính kèm đã có:</h4>
+                  {giaiTrinh.giaiTrinhFiles.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Chưa có tệp đính kèm nào.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {giaiTrinh.giaiTrinhFiles.map((file) => (
+                        <li key={file.id} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <FileTextIcon className="size-4 text-muted-foreground" />
+                            <span>{file.tenFile}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <Button
-                                    variant="outline"
-                                    onClick={() => handleCompleteGiaiTrinh(giaiTrinh.id)}
-                                >
-                                    <CheckCircle className="mr-2 size-4" /> Hoàn thành Giải Trình
-                                </Button>
-                            )}
-                            {canDeleteGiaiTrinh && (
-                                <Button variant="destructive" onClick={() => handleDeleteGiaiTrinh(giaiTrinh.id)}>
-                                    <Trash2 className="mr-2 size-4" /> Xóa Giải Trình
-                                </Button>
-                            )}
-                        </div>
+                                  variant="ghost" size="sm"
+                                  onClick={() => handleDownloadFile(file.linkFile, file.tenFile)}>
+                                  <DownloadIcon className="size-4" />
+                                </Button>                                
+                              </TooltipTrigger>
+                              <TooltipContent>Tải xuống tệp</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
 
-                        {/* Phần hiển thị và quản lý Nội dung Giải Trình (NDGiaiTrinh) */}
-                        <div className="mt-6">
-                            <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-lg font-semibold">Nội dung Giải Trình</h4>
-                                {canAddNDGiaiTrinh && (
-                                    <Button size="sm" onClick={handleOpenCreateNDGiaiTrinhModal}>
-                                        <MessageSquarePlus className="mr-2 size-4" /> Thêm Nội dung
-                                    </Button>
-                                )}
-                            </div>
-                            <NDGiaiTrinhTable
-                                ndGiaiTrinhList={ndGiaiTrinhList}
-                                loading={ndLoading}
-                                canEvaluate={canEditGiaiTrinh} 
-                                canDeleteND={canDeleteGiaiTrinh}
-                                onDeleteND={handleDeleteNDGiaiTrinh}
-                                onEvaluateND={handleDanhGiaNDGiaiTrinh}
-                                onViewND={handleOpenViewNDGiaiTrinhModal}
-                                getDownloadUrl={getDownloadUrl}
-                                canManipulateND={canAddNDGiaiTrinh}
-                            />
-                        </div>
+                <div className="flex justify-end gap-2 mt-4">
+                  {canUploadGiaiTrinhFile && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button onClick={handleOpenGiaiTrinhModal}>
+                          <Edit className="size-4" />
+                        </Button>                        
+                      </TooltipTrigger>
+                      <TooltipContent>Quản lý File</TooltipContent>
+                    </Tooltip>
+                  )}
+                  {giaiTrinh.trangThaiTongThe === 'Chờ Giải Trình' && canEditGiaiTrinh && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleCompleteGiaiTrinh(giaiTrinh.id)}>
+                          <CheckCircle className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Hoàn thành Giải Trình</TooltipContent>
+                    </Tooltip>
+                  )}
+                  {canDeleteGiaiTrinh && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleOpenDeleteConfirm(giaiTrinh.id)}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Xóa Giải Trình</TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
 
-                    </div>
-                ) : (
-                    <div className="p-4 text-center text-muted-foreground border rounded-md">
-                        Chưa có yêu cầu Giải Trình nào cho kế hoạch "{selectedPlan.name}".
-                        {canCreateGiaiTrinh && (
-                            <Button onClick={handleOpenGiaiTrinhModal} className="mt-4">
-                                <PlusIcon className="mr-2 size-4" /> Tạo Yêu Cầu Giải Trình Mới
-                            </Button>
-                        )}
-                    </div>
+                {/* Phần hiển thị và quản lý Nội dung Giải Trình (NDGiaiTrinh) */}
+                <div className="mt-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="text-lg font-semibold">Nội dung Giải Trình</h4>
+                    {canAddNDGiaiTrinh && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button size="sm" onClick={handleOpenCreateNDGiaiTrinhModal}>
+                            <MessageSquarePlus className="mr-2 size-4" /> Thêm Nội dung
+                          </Button>                          
+                        </TooltipTrigger>
+                        <TooltipContent>Thêm Nội dung</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                  <NDGiaiTrinhTable
+                    ndGiaiTrinhList={ndGiaiTrinhList}
+                    loading={ndLoading}
+                    canEvaluate={canEditGiaiTrinh}
+                    canDeleteND={canDeleteGiaiTrinh}
+                    onDeleteND={handleDeleteNDGiaiTrinh}
+                    onEvaluateND={handleDanhGiaNDGiaiTrinh}
+                    onViewND={handleOpenViewNDGiaiTrinhModal}
+                    getDownloadUrl={getDownloadUrl}
+                    canManipulateND={canAddNDGiaiTrinh}
+                  />
+                </div>
+
+              </div>
+            ) : (
+              <div className="p-4 text-center text-muted-foreground border rounded-md">
+                Chưa có yêu cầu Giải Trình nào cho kế hoạch "{selectedPlan.name}".
+                {canCreateGiaiTrinh && (
+                  <Button onClick={handleOpenGiaiTrinhModal} className="mt-4">
+                    <PlusIcon className="mr-2 size-4" /> Tạo Yêu Cầu Giải Trình Mới
+                  </Button>
                 )}
-            </>
+              </div>
+            )}
+          </>
         )}
 
         <GiaiTrinhFormModal
@@ -354,22 +384,22 @@ export default function GiaiTrinhPage() {
         />
 
         {giaiTrinh?.id && (
-            <NDGiaiTrinhFormModal
-                isOpen={isNDGiaiTrinhModalOpen}
-                onClose={() => {
-                    setIsNDGiaiTrinhModalOpen(false);
-                    setCurrentNDGiaiTrinh(null);
-                    handleRemoveNDFile();
-                }}
-                currentNDGiaiTrinh={currentNDGiaiTrinh}
-                giaiTrinhId={giaiTrinh.id}
-                loading={ndLoading}
-                selectedNDFile={selectedNDFile}
-                handleNDFileChange={handleNDFileChange}
-                handleRemoveNDFile={handleRemoveNDFile}
-                onSaveNDGiaiTrinh={onSubmitNDGiaiTrinhForm}
-                getDownloadUrl={getDownloadUrl}
-            />
+          <NDGiaiTrinhFormModal
+            isOpen={isNDGiaiTrinhModalOpen}
+            onClose={() => {
+              setIsNDGiaiTrinhModalOpen(false);
+              setCurrentNDGiaiTrinh(null);
+              handleRemoveNDFile();
+            }}
+            currentNDGiaiTrinh={currentNDGiaiTrinh}
+            giaiTrinhId={giaiTrinh.id}
+            loading={ndLoading}
+            selectedNDFile={selectedNDFile}
+            handleNDFileChange={handleNDFileChange}
+            handleRemoveNDFile={handleRemoveNDFile}
+            onSaveNDGiaiTrinh={onSubmitNDGiaiTrinhForm}
+            getDownloadUrl={getDownloadUrl}
+          />
         )}
 
       </div>
