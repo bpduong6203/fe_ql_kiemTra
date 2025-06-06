@@ -28,22 +28,26 @@ export async function apiFetch<T = unknown>(
     if (typeof window !== 'undefined' && axiosError.response?.status) {
       const statusCode = axiosError.response.status;
       switch (statusCode) {
-        case 401: // Unauthorized
+        case 401:
           window.location.href = '/Unauthorized';
           throw new Error('Bạn cần đăng nhập để truy cập');
-        case 403: // Forbidden
+        case 403:
           window.location.href = '/Forbidden';
           throw new Error('Bạn không có quyền truy cập');
-        case 404: // Not Found - Có thể xảy ra nếu endpoint không tồn tại
+        case 404: 
           window.location.href = '/NotFound';
           throw new Error('Không tìm thấy tài nguyên');
         default:
-          // Xử lý các lỗi khác nếu cần, hoặc ném lỗi mặc định
           throw new Error(axiosError.response?.data?.message || `Lỗi không xác định: ${statusCode}`);
       }
     }
     throw new Error(axiosError.response?.data?.message || 'Lỗi không xác định');
   }
+}
+
+interface BackendErrorResponse {
+  message: string;
+  errors?: { [key: string]: string[] };
 }
 
 export async function fetchApiNoToken<T = unknown>(
@@ -60,24 +64,35 @@ export async function fetchApiNoToken<T = unknown>(
     });
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<LoginError>;
-    if (typeof window !== 'undefined' && axiosError.response?.status) {
+    const axiosError = error as AxiosError<BackendErrorResponse>;
+
+    if (axiosError.response) {
       const statusCode = axiosError.response.status;
+      const errorMessageFromBackend = axiosError.response.data?.message;
+      const validationErrors = axiosError.response.data?.errors; 
+
       switch (statusCode) {
-        case 401: // Unauthorized
-          window.location.href = '/Unauthorized';
-          throw new Error('Bạn cần đăng nhập để truy cập');
-        case 403: // Forbidden
-          window.location.href = '/Forbidden';
-          throw new Error('Bạn không có quyền truy cập');
-        case 404: // Not Found - Có thể xảy ra nếu endpoint không tồn tại
-          window.location.href = '/NotFound';
-          throw new Error('Không tìm thấy tài nguyên');
+        case 400: 
+          const detailedErrorMessage = validationErrors
+            ? Object.values(validationErrors).flat().join('; ')
+            : errorMessageFromBackend || 'Dữ liệu gửi lên không hợp lệ.';
+          throw new Error(detailedErrorMessage);
+        case 401:
+          throw new Error(errorMessageFromBackend || 'Tên đăng nhập hoặc mật khẩu không đúng.');
+        case 403:
+          throw new Error(errorMessageFromBackend || 'Bạn không có quyền thực hiện hành động này.');
+        case 404: 
+          throw new Error(errorMessageFromBackend || 'Không tìm thấy tài nguyên yêu cầu.');
+        case 500: 
+          throw new Error(errorMessageFromBackend || 'Lỗi máy chủ nội bộ. Vui lòng thử lại sau.');
         default:
-          throw new Error(axiosError.response?.data?.message || `Lỗi không xác định: ${statusCode}`);
+          throw new Error(errorMessageFromBackend || `Lỗi không xác định: ${statusCode}`);
       }
+    } else if (axiosError.request) {
+      throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.');
+    } else {
+      throw new Error(axiosError.message || 'Đã xảy ra lỗi không mong muốn.');
     }
-    throw new Error(axiosError.response?.data?.message || 'Lỗi không xác định');
   }
 }
 
