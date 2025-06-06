@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InputError from '@/components/input-error';
-import { apiFetch } from '@/lib/api';
+import { fetchApiNoToken } from '@/lib/api';
 import type { LoginResponse, LoginError } from '@/types/auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -25,7 +25,7 @@ const LoginForm = ({ onSubmit }: { onSubmit?: (username: string, password: strin
     setError('');
 
     try {
-      const data = await apiFetch<LoginResponse>('/auth/login', {
+      const data = await fetchApiNoToken<LoginResponse>('/auth/login', {
         method: 'POST',
         data: { Username: username, Password: password },
         headers: {
