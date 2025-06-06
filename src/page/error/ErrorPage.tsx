@@ -54,7 +54,7 @@ export default function ErrorPage({
 
         <div className="md:w-1/2 flex justify-center px-4 md:px-0">
           <div className="relative w-full max-w-md h-auto">
-            <div className="w-full h-auto object-contain rounded-lg shadow-xl">
+            <div className="w-full h-auto object-contain rounded-lg">
               {customImageRenderer}
             </div>
           </div>

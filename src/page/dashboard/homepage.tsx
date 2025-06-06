@@ -14,8 +14,6 @@ import {
   UserPlus,
   ArrowRight,
   BarChart2,
-  // ListTodo,
-  // Activity,
 } from 'lucide-react';
 import Heading from '@/components/heading';
 import HeadingSmall from '@/components/heading-small';

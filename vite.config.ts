@@ -1,4 +1,3 @@
-// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -7,27 +6,27 @@ import { env } from 'process';
 
 
 export default defineConfig({
- server: {
-   allowedHosts: ['quanlythanhtra.serveo.net', 'localhost'],
-   proxy: {
-     '/api': {
-       target: env.VITE_API_BASE_URL,
-       changeOrigin: true,
-       secure: false,
-     },
-   },
-   host: true,
-   port: 3000,
-   strictPort: true,
- },
+  server: {
+    allowedHosts: ['quanlythanhtra.serveo.net', 'localhost'],
+    proxy: {
+      '/api': {
+        target: env.VITE_API_BASE_URL,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+    host: true,
+    port: 3000,
+    strictPort: true,
+  },
 
 
- plugins: [react(), tailwindcss()],
- resolve: {
-   alias: {
-     '@': path.resolve(__dirname, './src'),
-   },
- },
- });
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+});
 
 
