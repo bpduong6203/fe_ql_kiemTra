@@ -52,7 +52,6 @@ export default function GiaiTrinhPage() {
     canUploadGiaiTrinhFile,
     canDeleteGiaiTrinhFile,
     selectedPlan,
-    currentUsername,
     canAddNDGiaiTrinh,
 
     selectedLocalFiles,
@@ -70,7 +69,7 @@ export default function GiaiTrinhPage() {
     handleSaveNDGiaiTrinh,
     handleDeleteNDGiaiTrinh,
     handleDanhGiaNDGiaiTrinh,
-  } = useNDGiaiTrinh(giaiTrinh?.id || null, currentUsername);
+  } = useNDGiaiTrinh(giaiTrinh?.id || null);
 
   const { addToast } = useToast();
 
