@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CardContent } from '@/components/ui/card';
-import { PlusIcon, SearchIcon } from 'lucide-react';
+import { PlusIcon, SearchIcon, Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetTrigger,
@@ -16,7 +16,9 @@ import {
 import { useKeHoach } from '@/page/dashboard/hooks/useKeHoach';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useToast } from '@/components/toast-provider';
-import { useSelectedPlan } from '@/context/SelectedPlanContext'; // Import context
+import { useSelectedPlan } from '@/context/SelectedPlanContext';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useLocation, matchPath } from 'react-router-dom';
 
 interface Plan {
   id: string;
@@ -29,14 +31,13 @@ const PlanManager: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [plans, setPlans] = useState<Plan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<Plan[]>([]);
-  
-  // Sử dụng context để get và set selectedPlan
-  const { selectedPlan, setSelectedPlanGlobally } = useSelectedPlan(); 
-  
+
+  const { selectedPlan, setSelectedPlanGlobally } = useSelectedPlan();
   const { keHoachList, loading, fetchKeHoachs } = useKeHoach();
   const { addToast } = useToast();
 
-  // Lấy danh sách kế hoạch từ API
+  const location = useLocation();
+
   useEffect(() => {
     const loadPlans = async () => {
       try {
@@ -48,7 +49,6 @@ const PlanManager: React.FC = () => {
     loadPlans();
   }, [fetchKeHoachs, addToast]);
 
-  // Ánh xạ keHoachList sang Plan và chọn kế hoạch đầu tiên nếu chưa có
   useEffect(() => {
     const mappedPlans: Plan[] = keHoachList
       .filter((keHoach) => !keHoach.isDeleted)
@@ -60,14 +60,27 @@ const PlanManager: React.FC = () => {
     setPlans(mappedPlans);
     setFilteredPlans(mappedPlans);
 
-    // Nếu chưa có selectedPlan trong context, chọn kế hoạch đầu tiên
-    if (!selectedPlan && mappedPlans.length > 0) {
-      const firstPlan = mappedPlans[0];
-      setSelectedPlanGlobally(firstPlan); // Cập nhật qua context
-    }
-  }, [keHoachList, selectedPlan, setSelectedPlanGlobally]); // Thêm setSelectedPlanGlobally vào dependency
+    let planToSelect: Plan | null = null; 
 
-  // Lọc kế hoạch theo thanh tìm kiếm
+    const match = matchPath('/ke_hoach/:keHoachId/*', location.pathname);
+    const keHoachIdFromUrl = match?.params?.keHoachId as string | undefined;
+
+    if (keHoachIdFromUrl) {
+      planToSelect = mappedPlans.find(p => p.id === keHoachIdFromUrl) || null;
+      if (planToSelect) {
+        if (!selectedPlan || selectedPlan.id !== planToSelect.id) {
+          setSelectedPlanGlobally(planToSelect);
+        }
+        return;
+      }
+    }
+
+    if (!selectedPlan && mappedPlans.length > 0) {
+      planToSelect = mappedPlans[0];
+      setSelectedPlanGlobally(planToSelect);
+    }
+  }, [keHoachList, selectedPlan, setSelectedPlanGlobally, location.pathname]);
+
   useEffect(() => {
     const filtered = plans.filter((plan) =>
       plan.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -75,13 +88,11 @@ const PlanManager: React.FC = () => {
     setFilteredPlans(filtered);
   }, [searchQuery, plans]);
 
-  // Xử lý chọn kế hoạch
   const handleSelectPlan = useCallback((plan: Plan) => {
-    setSelectedPlanGlobally(plan); // Cập nhật qua context
+    setSelectedPlanGlobally(plan);
     setOpen(false);
-  }, [setSelectedPlanGlobally]); // Thêm setSelectedPlanGlobally vào dependency
+  }, [setSelectedPlanGlobally]);
 
-  // Đóng sheet
   const handleClose = useCallback(() => {
     setOpen(false);
     setSearchQuery('');
@@ -100,18 +111,26 @@ const PlanManager: React.FC = () => {
           <SheetTitle>Quản lý kế hoạch</SheetTitle>
         </SheetHeader>
         <div className="space-y-4 py-4">
-          {/* Thanh tìm kiếm */}
-          <div className="relative mr-2 ml-2">
+          <div className="flex relative mr-2 ml-2">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Tìm kiếm kế hoạch..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 mr-3"
             />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="destructive" size="icon">
+                  <Trash2 className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Danh sách kế hoạch đã xóa
+              </TooltipContent>
+            </Tooltip>
           </div>
 
-          {/* Danh sách kế hoạch */}
           <CardContent className="p-0">
             {loading ? (
               <>

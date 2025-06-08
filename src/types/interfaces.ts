@@ -159,3 +159,15 @@ export interface NDGiaiTrinhPayload {
 export interface DanhGiaNDGiaiTrinhPayload {
   trangThai: 'Đạt' | 'Chưa Đạt' | 'Đã Sửa'; 
 }
+
+
+export interface ThongBao {
+    id: string;
+    userID: string;
+    keHoachID: string;
+    noiDung: string;
+    redirectUrl?: string;
+    ngayTao: Date;
+    daXem: boolean;
+    tenKeHoach?: string;
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+// src/components/layout/app-sidebar-header.tsx
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,18 +14,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/toast-provider';
-
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useNotifications } from '@/page/dashboard/hooks/useNotifications';
 
-interface Notification {
-    id: string;
-    message: string;
-    read: boolean;
-    timestamp: string;
-    link?: string;
-}
 
 const rightNavItems: NavItem[] = [
     {
@@ -36,46 +28,15 @@ const rightNavItems: NavItem[] = [
 ];
 
 export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
-    const { addToast } = useToast();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const unreadCount = notifications.filter(n => !n.read).length;
-
-    useEffect(() => {
-        const mockFetchNotifications = () => {
-            const mockData: Notification[] = [
-                { id: '1', message: 'Kế hoạch "Kiểm toán Q2" đã được duyệt.', read: false, timestamp: '2025-06-03T10:00:00Z', link: '/ke_hoach/123' },
-                { id: '2', message: 'Bạn có một yêu cầu giải trình mới từ Nguyễn Văn A.', read: false, timestamp: '2025-06-03T09:30:00Z', link: '/giai_trinh/456' },
-                { id: '3', message: 'Báo cáo "Doanh thu tháng 5" đã hoàn thành.', read: true, timestamp: '2025-06-02T16:00:00Z' },
-                { id: '4', message: 'Đơn vị ABC đã cập nhật thông tin.', read: false, timestamp: '2025-06-01T14:15:00Z', link: '/don_vi/789' },
-            ];
-            setNotifications(mockData);
-        };
-        mockFetchNotifications();
-    }, []);
-
-    const handleMarkAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(n => (n.id === id ? { ...n, read: true } : n))
-        );
-        addToast('Đã đánh dấu là đã đọc', 'info');
-    };
-
-    const handleMarkAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-        addToast('Đã đánh dấu tất cả là đã đọc', 'success');
-    };
-
-    const handleDeleteNotification = (id: string) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-        addToast('Đã xóa thông báo', 'info');
-    };
-
-    const handleNotificationClick = (notification: Notification) => {
-        handleMarkAsRead(notification.id);
-        if (notification.link) {
-            window.location.href = notification.link;
-        }
-    };
+    const {
+        notifications,
+        loading,
+        error,
+        unreadCount,
+        handleMarkAllAsRead,
+        handleDeleteNotification,
+        handleNotificationClick,
+    } = useNotifications();
 
     return (
         <header className="border-sidebar-border/50 flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4 justify-between">
@@ -111,10 +72,17 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                         <DropdownMenuContent className="w-80 p-2" align="end">
                                             <DropdownMenuLabel className="flex items-center justify-between font-semibold">
                                                 <span>Thông báo</span>
-                                                {/* Nút "Đánh dấu đã đọc tất cả" ĐÃ ĐƯỢC CHUYỂN XUỐNG DƯỚI */}
                                             </DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            {notifications.length === 0 ? (
+                                            {loading ? (
+                                                <DropdownMenuItem className="text-center text-muted-foreground" disabled>
+                                                    Đang tải thông báo...
+                                                </DropdownMenuItem>
+                                            ) : error ? (
+                                                <DropdownMenuItem className="text-center text-destructive" disabled>
+                                                    Lỗi: {error}
+                                                </DropdownMenuItem>
+                                            ) : notifications.length === 0 ? (
                                                 <DropdownMenuItem className="text-center text-muted-foreground" disabled>
                                                     Không có thông báo mới.
                                                 </DropdownMenuItem>
@@ -122,12 +90,17 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                                 notifications.map(notification => (
                                                     <DropdownMenuItem
                                                         key={notification.id}
-                                                        className={`flex items-start gap-2 p-2 ${!notification.read ? 'bg-accent/20 font-medium' : 'text-muted-foreground'}`}
+                                                        className={`flex items-start gap-2 p-2 ${!notification.daXem ? 'bg-accent/20 font-medium' : 'text-muted-foreground'}`}
                                                         onClick={() => handleNotificationClick(notification)}
                                                     >
                                                         <div className="flex-1">
-                                                            <p className="line-clamp-2">{notification.message}</p>
-                                                            <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true, locale: vi })}</span>
+                                                            <p className="line-clamp-2">{notification.noiDung}</p> 
+                                                            {notification.tenKeHoach && (
+                                                                <p className="text-xs text-muted-foreground">Kế hoạch: {notification.tenKeHoach}</p>
+                                                            )}
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {formatDistanceToNow(notification.ngayTao, { addSuffix: true, locale: vi })}
+                                                            </span>
                                                         </div>
                                                         <Button
                                                             variant="ghost"
@@ -141,12 +114,12 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                                     </DropdownMenuItem>
                                                 ))
                                             )}
-                                            {unreadCount > 0 && notifications.length > 0 && ( 
+                                            {unreadCount > 0 && notifications.length > 0 && (
                                                 <>
-                                                    <DropdownMenuSeparator /> 
-                                                    <DropdownMenuItem asChild> 
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem asChild>
                                                         <Button
-                                                            variant="link" 
+                                                            variant="link"
                                                             size="sm"
                                                             onClick={handleMarkAllAsRead}
                                                             className="w-full text-center py-1.5"
