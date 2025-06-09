@@ -46,7 +46,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
             </div>
             <div className="flex items-center space-x-2">
                 <div className="relative flex items-center space-x-1">
-                    <div className="hidden lg:flex">
+                    <div className="lg:flex">
                         {rightNavItems.map((item) => (
                             <TooltipProvider key={item.title} delayDuration={0}>
                                 <Tooltip>
