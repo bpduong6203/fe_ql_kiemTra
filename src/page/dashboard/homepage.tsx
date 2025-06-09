@@ -22,7 +22,7 @@ const HomePage = () => {
         </div>
 
         {/* Footer - Consistent and modern look */}
-        <footer className="bg-gray-800 text-white py-8 md:py-10 dark:bg-gray-950">
+        <footer className="bg-gray-800 text-white py-8 md:py-10 dark:bg-gray-950 mt-4">
           <div className="container mx-auto px-4 md:px-6 text-center">
             <p className="mb-3 md:mb-4 text-gray-400 text-sm md:text-base">&copy; 2025 Tên Ứng Dụng. All rights reserved.</p>
             <div className="flex justify-center gap-4 md:gap-6 text-gray-300 text-sm md:text-base">

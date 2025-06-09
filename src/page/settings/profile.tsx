@@ -15,20 +15,20 @@ type ProfileProps = {};
 
 type ProfileForm = {
     id: string;
-    username: string; 
+    username: string;
     hoTen: string;
     email: string;
     soDienThoai?: string;
     diaChi?: string;
     roleID?: string;
     donViID?: string;
-    password?: string; 
+    password?: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
-        href: '/settings/profile', 
+        title: 'Cài đặt hồ sơ',
+        href: '/settings/profile',
     },
 ];
 
@@ -41,7 +41,7 @@ export default function Profile({}: ProfileProps) {
         email: '',
         soDienThoai: '',
         diaChi: '',
-        roleID: '', 
+        roleID: '',
         donViID: '',
         password: '',
     });
@@ -62,10 +62,11 @@ export default function Profile({}: ProfileProps) {
                     soDienThoai: userInfo.soDienThoai || '',
                     diaChi: userInfo.diaChi || '',
                     roleID: userInfo.roleID,
-                    donViID: userInfo.donViID, 
+                    donViID: userInfo.donViID,
+                    // Không bao gồm password khi fetch
                 });
             } catch (err) {
-                console.error('Error fetching user info:', err);
+                console.error('Lỗi khi tải thông tin người dùng.', err);
                 addToast('Lỗi khi tải thông tin người dùng.', 'error');
             }
         };
@@ -84,7 +85,7 @@ export default function Profile({}: ProfileProps) {
     const submit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault();
         setProcessing(true);
-        setErrors({}); 
+        setErrors({});
 
         if (!formData.id) {
             addToast('Không tìm thấy ID người dùng để cập nhật.', 'error');
@@ -93,29 +94,33 @@ export default function Profile({}: ProfileProps) {
         }
 
         const payload: Partial<NguoiDung> = {
-            username: formData.username, 
+            username: formData.username,
             hoTen: formData.hoTen,
             email: formData.email,
             soDienThoai: formData.soDienThoai,
             diaChi: formData.diaChi,
-            roleID: formData.roleID, 
-            donViID: formData.donViID, 
-            password: formData.password, 
         };
 
-        try {
-            const response = await updateUser(formData.id, payload); 
+        Object.keys(payload).forEach(key => {
+            if (payload[key as keyof Partial<NguoiDung>] === undefined || payload[key as keyof Partial<NguoiDung>] === null) {
+                delete payload[key as keyof Partial<NguoiDung>];
+            }
+        });
 
-            addToast(response.message || 'Cập nhật profile thành công!', 'success');
+
+        try {
+            const response = await updateUser(formData.id, payload);
+
+            addToast(response.message || 'Cập nhật hồ sơ thành công!', 'success'); 
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 2000);
 
         } catch (err: any) {
-            console.error('Error updating profile:', err);
+            console.error('Lỗi khi cập nhật hồ sơ:', err); 
             if (err.response?.data?.errors) {
                 setErrors(err.response.data.errors);
             } else {
-                addToast(err.message || 'Lỗi khi cập nhật profile.', 'error');
+                addToast(err.message || 'Lỗi khi cập nhật hồ sơ.', 'error'); 
             }
         } finally {
             setProcessing(false);
@@ -126,7 +131,10 @@ export default function Profile({}: ProfileProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Thông tin cá nhân" description="Cập nhật tên, email và các thông tin khác của bạn" />
+                    <HeadingSmall
+                        title="Thông tin cá nhân" 
+                        description="Cập nhật tên, email và các thông tin khác của bạn" 
+                    />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -136,9 +144,9 @@ export default function Profile({}: ProfileProps) {
                                 name="username"
                                 className="mt-1 block w-full"
                                 value={formData.username}
-                                onChange={handleChange} 
+                                onChange={handleChange}
                                 required
-                                readOnly 
+                                readOnly
                                 placeholder="Tên đăng nhập"
                             />
                             <InputError className="mt-2" message={errors.username} />
@@ -154,7 +162,7 @@ export default function Profile({}: ProfileProps) {
                                 onChange={handleChange}
                                 required
                                 autoComplete="name"
-                                placeholder="Họ và Tên"
+                                placeholder="Họ và Tên" 
                             />
                             <InputError className="mt-2" message={errors.hoTen} />
                         </div>
@@ -170,7 +178,7 @@ export default function Profile({}: ProfileProps) {
                                 onChange={handleChange}
                                 required
                                 autoComplete="username"
-                                placeholder="Địa chỉ Email"
+                                placeholder="Địa chỉ Email" 
                             />
                             <InputError className="mt-2" message={errors.email} />
                         </div>
@@ -190,20 +198,20 @@ export default function Profile({}: ProfileProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="diaChi">Địa chỉ</Label>
+                            <Label htmlFor="diaChi">Địa chỉ</Label> 
                             <Input
                                 id="diaChi"
                                 name="diaChi"
                                 className="mt-1 block w-full"
                                 value={formData.diaChi || ''}
                                 onChange={handleChange}
-                                placeholder="Địa chỉ"
+                                placeholder="Địa chỉ" 
                             />
                             <InputError className="mt-2" message={errors.diaChi} />
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Lưu</Button>
+                            <Button disabled={processing}>Lưu</Button> 
 
                             {recentlySuccessful && (
                                 <p className="text-sm text-green-600">Đã lưu!</p>

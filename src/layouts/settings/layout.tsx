@@ -2,24 +2,24 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type NavItem } from '@/types'; 
+import { type NavItem } from '@/types';
 import { type PropsWithChildren } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Hồ sơ',
         url: '/settings/profile',
         icon: null,
     },
     {
-        title: 'Password',
+        title: 'Mật khẩu', 
         url: '/settings/password',
         icon: null,
     },
     {
-        title: 'Appearance',
-        url: '/settings/appearance', 
+        title: 'Giao diện',
+        url: '/settings/appearance',
         icon: null,
     },
 ];
@@ -30,22 +30,25 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Settings" description="Manage your profile and account settings" />
+            <Heading
+                title="Cài đặt" 
+                description="Quản lý hồ sơ và cài đặt tài khoản của bạn" 
+            />
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${item.url}-${index}`} 
+                                key={`${item.url}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === item.url, 
+                                    'bg-muted': currentPath === item.url,
                                 })}
                             >
-                                <Link to={item.url}> 
+                                <Link to={item.url}>
                                     {item.title}
                                 </Link>
                             </Button>

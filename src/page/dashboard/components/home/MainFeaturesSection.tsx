@@ -13,7 +13,7 @@ import {
 
 const MainFeaturesSection = () => {
   return (
-    <section className="py-12 md:py-16 bg-gray-50 dark:bg-gray-900">
+    <section className="py-2 md:py-4 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 md:px-6">
         <Heading
           title="Các Chức Năng Chính"

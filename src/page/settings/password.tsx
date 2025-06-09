@@ -13,7 +13,7 @@ import type { NguoiDung } from '@/types/interfaces';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Password settings',
+        title: 'Cài đặt mật khẩu', 
         href: '/settings/password',
     },
 ];
@@ -105,7 +105,7 @@ export default function Password() {
                 password: '',
                 password_confirmation: '',
             });
-            currentPasswordInput.current?.focus(); 
+            currentPasswordInput.current?.focus();
 
         } catch (err: any) {
             console.error('Lỗi khi cập nhật mật khẩu:', err);
@@ -128,9 +128,12 @@ export default function Password() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Cập nhật mật khẩu" description="Đảm bảo tài khoản của bạn sử dụng mật khẩu dài, ngẫu nhiên để an toàn" />
+                    <HeadingSmall
+                        title="Cập nhật mật khẩu" 
+                        description="Đảm bảo tài khoản của bạn sử dụng mật khẩu dài, ngẫu nhiên để an toàn"
+                    />
 
-                    <form onSubmit={handleSubmitPasswordUpdate} className="space-y-6"> {/* Thay đổi ở đây */}
+                    <form onSubmit={handleSubmitPasswordUpdate} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="current_password">Mật khẩu hiện tại</Label>
                             <Input
@@ -142,13 +145,13 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
-                                placeholder="Mật khẩu hiện tại"
+                                placeholder="Mật khẩu hiện tại" 
                             />
                             <InputError message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Mật khẩu mới</Label>
+                            <Label htmlFor="password">Mật khẩu mới</Label> 
                             <Input
                                 id="password"
                                 name="password"
@@ -164,7 +167,7 @@ export default function Password() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Xác nhận mật khẩu</Label>
+                            <Label htmlFor="password_confirmation">Xác nhận mật khẩu</Label> 
                             <Input
                                 id="password_confirmation"
                                 name="password_confirmation"
@@ -173,7 +176,7 @@ export default function Password() {
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
-                                placeholder="Xác nhận mật khẩu"
+                                placeholder="Xác nhận mật khẩu" 
                             />
                             <InputError message={errors.password_confirmation} />
                         </div>
@@ -182,7 +185,7 @@ export default function Password() {
                             <Button disabled={processing}>Lưu mật khẩu</Button>
 
                             {recentlySuccessful && (
-                                <p className="text-sm text-green-600">Đã lưu!</p>
+                                <p className="text-sm text-green-600">Đã lưu!</p> 
                             )}
                         </div>
                     </form>
