@@ -18,6 +18,15 @@ interface PhanCongViewModalProps {
   selectedPhanCong: PhanCongUser | null;
 }
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+const getDownloadUrl = (linkFile: string) => {
+  if (linkFile.startsWith('http://') || linkFile.startsWith('https://')) {
+    return linkFile;
+  }
+  return `${baseUrl}${linkFile.startsWith('/') ? '' : '/'}${linkFile}`;
+};
+
 export const PhanCongViewModal: React.FC<PhanCongViewModalProps> = ({
   isOpen,
   onClose,
@@ -62,7 +71,7 @@ export const PhanCongViewModal: React.FC<PhanCongViewModalProps> = ({
               <div className="col-span-2">
                 {selectedPhanCong.linkFile ? (
                   <Button asChild variant="outline" size="sm">
-                    <a href={selectedPhanCong.linkFile} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                    <a href={getDownloadUrl(selectedPhanCong.linkFile)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
                       <Download className="size-4" /> Tải xuống file
                     </a>
                   </Button>

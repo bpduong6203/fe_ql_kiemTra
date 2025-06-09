@@ -1,4 +1,3 @@
-// src/components/layout/app-sidebar-header.tsx
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -69,7 +68,9 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                                 </Button>
                                             </TooltipTrigger>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-80 p-2" align="end">
+                                        <DropdownMenuContent
+                                            className="w-80 p-2 max-h-[70vh] overflow-y-auto"
+                                            align="end"                                        >
                                             <DropdownMenuLabel className="flex items-center justify-between font-semibold">
                                                 <span>Thông báo</span>
                                             </DropdownMenuLabel>
@@ -94,7 +95,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                                                         onClick={() => handleNotificationClick(notification)}
                                                     >
                                                         <div className="flex-1">
-                                                            <p className="line-clamp-2">{notification.noiDung}</p> 
+                                                            <p className="line-clamp-2">{notification.noiDung}</p>
                                                             {notification.tenKeHoach && (
                                                                 <p className="text-xs text-muted-foreground">Kế hoạch: {notification.tenKeHoach}</p>
                                                             )}
