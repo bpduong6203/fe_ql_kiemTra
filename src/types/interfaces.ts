@@ -171,3 +171,10 @@ export interface ThongBao {
     daXem: boolean;
     tenKeHoach?: string;
 }
+
+export interface UpdateProfilePayload {
+  hoTen?: string;
+  email?: string;
+  soDienThoai?: string;
+  diaChi?: string;
+}

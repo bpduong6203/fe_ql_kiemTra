@@ -19,9 +19,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type PasswordForm = {
-    current_password: string;
-    password: string;
-    password_confirmation: string;
+    CurrentPassword: string;
+    Password: string;
+    ConfirmPassword: string;
 };
 
 export default function Password() {
@@ -30,9 +30,9 @@ export default function Password() {
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     const [formData, setFormData] = useState<PasswordForm>({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+        CurrentPassword: '',
+        Password: '',
+        ConfirmPassword: '',
     });
     const [errors, setErrors] = useState<Partial<PasswordForm>>({});
     const [processing, setProcessing] = useState(false);
@@ -65,35 +65,35 @@ export default function Password() {
         setProcessing(true);
         setErrors({});
 
-        if (!formData.current_password) {
+        if (!formData.CurrentPassword) {
             setErrors(prev => ({ ...prev, current_password: 'Mật khẩu hiện tại không được để trống.' }));
             setProcessing(false); return;
         }
-        if (!formData.password) {
+        if (!formData.Password) {
             setErrors(prev => ({ ...prev, password: 'Mật khẩu mới không được để trống.' }));
             setProcessing(false); return;
         }
-        if (!formData.password_confirmation) {
+        if (!formData.ConfirmPassword) {
             setErrors(prev => ({ ...prev, password_confirmation: 'Xác nhận mật khẩu không được để trống.' }));
             setProcessing(false); return;
         }
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-        if (!passwordRegex.test(formData.password)) {
+        if (!passwordRegex.test(formData.Password)) {
             setErrors(prev => ({ ...prev, password: 'Mật khẩu phải dài ít nhất 8 ký tự, chứa ít nhất 1 chữ hoa, 1 chữ thường và 1 ký tự đặc biệt (!@#$%^&*).' }));
             setProcessing(false); return;
         }
 
-        if (formData.password !== formData.password_confirmation) {
+        if (formData.Password !== formData.ConfirmPassword) {
             setErrors(prev => ({ ...prev, password_confirmation: 'Mật khẩu mới và xác nhận mật khẩu không khớp.' }));
             setProcessing(false); return;
         }
 
         try {
             const response = await updatePasswordAPI({
-                current_password: formData.current_password,
-                password: formData.password,
-                password_confirmation: formData.password_confirmation,
+                current_password: formData.CurrentPassword,
+                password: formData.Password,
+                password_confirmation: formData.ConfirmPassword,
             });
 
             addToast(response.message || 'Cập nhật mật khẩu thành công!', 'success');
@@ -101,9 +101,9 @@ export default function Password() {
             setTimeout(() => setRecentlySuccessful(false), 2000);
 
             setFormData({
-                current_password: '',
-                password: '',
-                password_confirmation: '',
+                CurrentPassword: '',
+                Password: '',
+                ConfirmPassword: '',
             });
             currentPasswordInput.current?.focus();
 
@@ -140,14 +140,14 @@ export default function Password() {
                                 id="current_password"
                                 name="current_password"
                                 ref={currentPasswordInput}
-                                value={formData.current_password}
+                                value={formData.CurrentPassword}
                                 onChange={handleChange}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="current-password"
                                 placeholder="Mật khẩu hiện tại" 
                             />
-                            <InputError message={errors.current_password} />
+                            <InputError message={errors.CurrentPassword} />
                         </div>
 
                         <div className="grid gap-2">
@@ -156,14 +156,14 @@ export default function Password() {
                                 id="password"
                                 name="password"
                                 ref={passwordInput}
-                                value={formData.password}
+                                value={formData.Password}
                                 onChange={handleChange}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="Mật khẩu mới"
                             />
-                            <InputError message={errors.password} />
+                            <InputError message={errors.Password} />
                         </div>
 
                         <div className="grid gap-2">
@@ -171,14 +171,14 @@ export default function Password() {
                             <Input
                                 id="password_confirmation"
                                 name="password_confirmation"
-                                value={formData.password_confirmation}
+                                value={formData.ConfirmPassword}
                                 onChange={handleChange}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="Xác nhận mật khẩu" 
                             />
-                            <InputError message={errors.password_confirmation} />
+                            <InputError message={errors.ConfirmPassword} />
                         </div>
 
                         <div className="flex items-center gap-4">

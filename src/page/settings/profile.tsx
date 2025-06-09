@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { useToast } from '@/components/toast-provider';
-import { updateUser, getUserInfo } from '@/lib/apiuser';
-import type { NguoiDung } from '@/types/interfaces';
+import { updateMyProfile, getUserInfo } from '@/lib/apiuser';
+import type { UpdateProfilePayload } from '@/types/interfaces'; 
 
 type ProfileProps = {};
 
@@ -20,9 +20,6 @@ type ProfileForm = {
     email: string;
     soDienThoai?: string;
     diaChi?: string;
-    roleID?: string;
-    donViID?: string;
-    password?: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -41,9 +38,6 @@ export default function Profile({}: ProfileProps) {
         email: '',
         soDienThoai: '',
         diaChi: '',
-        roleID: '',
-        donViID: '',
-        password: '',
     });
     const [errors, setErrors] = useState<Partial<ProfileForm>>({});
     const [processing, setProcessing] = useState(false);
@@ -52,7 +46,7 @@ export default function Profile({}: ProfileProps) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userInfo: NguoiDung = await getUserInfo();
+                const userInfo = await getUserInfo();
 
                 setFormData({
                     id: userInfo.id,
@@ -61,9 +55,6 @@ export default function Profile({}: ProfileProps) {
                     email: userInfo.email || '',
                     soDienThoai: userInfo.soDienThoai || '',
                     diaChi: userInfo.diaChi || '',
-                    roleID: userInfo.roleID,
-                    donViID: userInfo.donViID,
-                    // Không bao gồm password khi fetch
                 });
             } catch (err) {
                 console.error('Lỗi khi tải thông tin người dùng.', err);
@@ -93,34 +84,37 @@ export default function Profile({}: ProfileProps) {
             return;
         }
 
-        const payload: Partial<NguoiDung> = {
-            username: formData.username,
+        const payload: UpdateProfilePayload = { 
             hoTen: formData.hoTen,
             email: formData.email,
             soDienThoai: formData.soDienThoai,
             diaChi: formData.diaChi,
         };
 
-        Object.keys(payload).forEach(key => {
-            if (payload[key as keyof Partial<NguoiDung>] === undefined || payload[key as keyof Partial<NguoiDung>] === null) {
-                delete payload[key as keyof Partial<NguoiDung>];
+        const filteredPayload: UpdateProfilePayload = {}; 
+        for (const key in payload) {
+            if (payload[key as keyof typeof payload] !== undefined && payload[key as keyof typeof payload] !== null) {
+                if (key === 'email' && typeof payload[key] === 'string' && payload[key] === '') {
+                    filteredPayload[key as keyof typeof payload] = payload[key as keyof typeof payload];
+                } else if (payload[key as keyof typeof payload] !== '') { 
+                    filteredPayload[key as keyof typeof payload] = payload[key as keyof typeof payload];
+                }
             }
-        });
-
+        }
 
         try {
-            const response = await updateUser(formData.id, payload);
+            const response = await updateMyProfile(filteredPayload);
 
-            addToast(response.message || 'Cập nhật hồ sơ thành công!', 'success'); 
+            addToast(response.message || 'Cập nhật hồ sơ thành công!', 'success');
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 2000);
 
         } catch (err: any) {
-            console.error('Lỗi khi cập nhật hồ sơ:', err); 
+            console.error('Lỗi khi cập nhật hồ sơ:', err);
             if (err.response?.data?.errors) {
                 setErrors(err.response.data.errors);
             } else {
-                addToast(err.message || 'Lỗi khi cập nhật hồ sơ.', 'error'); 
+                addToast(err.message || 'Lỗi khi cập nhật hồ sơ.', 'error');
             }
         } finally {
             setProcessing(false);
@@ -132,8 +126,8 @@ export default function Profile({}: ProfileProps) {
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Thông tin cá nhân" 
-                        description="Cập nhật tên, email và các thông tin khác của bạn" 
+                        title="Thông tin cá nhân"
+                        description="Cập nhật tên, email và các thông tin khác của bạn"
                     />
 
                     <form onSubmit={submit} className="space-y-6">
@@ -144,9 +138,8 @@ export default function Profile({}: ProfileProps) {
                                 name="username"
                                 className="mt-1 block w-full"
                                 value={formData.username}
-                                onChange={handleChange}
-                                required
                                 readOnly
+                                disabled
                                 placeholder="Tên đăng nhập"
                             />
                             <InputError className="mt-2" message={errors.username} />
@@ -162,7 +155,7 @@ export default function Profile({}: ProfileProps) {
                                 onChange={handleChange}
                                 required
                                 autoComplete="name"
-                                placeholder="Họ và Tên" 
+                                placeholder="Họ và Tên"
                             />
                             <InputError className="mt-2" message={errors.hoTen} />
                         </div>
@@ -178,7 +171,7 @@ export default function Profile({}: ProfileProps) {
                                 onChange={handleChange}
                                 required
                                 autoComplete="username"
-                                placeholder="Địa chỉ Email" 
+                                placeholder="Địa chỉ Email"
                             />
                             <InputError className="mt-2" message={errors.email} />
                         </div>
@@ -198,20 +191,20 @@ export default function Profile({}: ProfileProps) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="diaChi">Địa chỉ</Label> 
+                            <Label htmlFor="diaChi">Địa chỉ</Label>
                             <Input
                                 id="diaChi"
                                 name="diaChi"
                                 className="mt-1 block w-full"
                                 value={formData.diaChi || ''}
                                 onChange={handleChange}
-                                placeholder="Địa chỉ" 
+                                placeholder="Địa chỉ"
                             />
                             <InputError className="mt-2" message={errors.diaChi} />
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Lưu</Button> 
+                            <Button disabled={processing}>Lưu</Button>
 
                             {recentlySuccessful && (
                                 <p className="text-sm text-green-600">Đã lưu!</p>

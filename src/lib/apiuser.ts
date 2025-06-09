@@ -1,4 +1,4 @@
-import type { NguoiDung } from "@/types/interfaces";
+import type { NguoiDung, UpdateProfilePayload } from "@/types/interfaces";
 import { apiFetch } from "./api";
 
 export async function getAllUsers(): Promise<NguoiDung[]> {
@@ -46,4 +46,8 @@ export async function updatePassword(
   data: { current_password: string; password: string; password_confirmation: string }
 ): Promise<{ message: string }> {
   return apiFetch(`/auth/change-password`, { method: 'PATCH', data });
+}
+
+export async function updateMyProfile(data: UpdateProfilePayload): Promise<{ message: string }> { // SỬA KIỂU DỮ LIỆU Ở ĐÂY
+  return apiFetch('/auth/profile', { method: 'PATCH', data });
 }
