@@ -17,6 +17,7 @@ import GiaiTrinhPage from './page/dashboard/giaiTrinh';
 import ForbiddenPage from './page/error/ForbiddenPage';
 import NotFoundPage from './page/error/NotFoundPage';
 import UnauthorizedPage from './page/error/UnauthorizedPage';
+import KeHoachManagementPage from './page/dashboard/KeHoachManagementPage';
 
 const App = () => {
   console.log('Rendering App.tsx');
@@ -46,6 +47,7 @@ const App = () => {
               <Route path='/settings/profile' element={<Profile />} />
               <Route path='/settings/password' element={<Password />} />
               <Route path='/giai_trinh' element={<GiaiTrinhPage />} />
+              <Route path='/danh_sach_ke_hoach' element={<KeHoachManagementPage/>} />
             </Routes>          
           </SelectedPlanProvider>
         </AuthProvider>

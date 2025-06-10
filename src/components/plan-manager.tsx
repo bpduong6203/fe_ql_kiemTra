@@ -121,12 +121,14 @@ const PlanManager: React.FC = () => {
             />
             <Tooltip>
               <TooltipTrigger asChild>
+                <a href='/danh_sach_ke_hoach'>
                 <Button variant="destructive" size="icon">
                   <Trash2 className="size-4" />
                 </Button>
+                </a>
               </TooltipTrigger>
               <TooltipContent>
-                Danh sách kế hoạch đã xóa
+                Danh sách kế hoạch
               </TooltipContent>
             </Tooltip>
           </div>

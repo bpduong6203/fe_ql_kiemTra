@@ -72,7 +72,6 @@ const KeHoachDetail: React.FC = () => {
       addToast('Thêm tài liệu thành công!', 'success');
       fetchKeHoachDetail();
     } catch (error) {
-      console.error('Error adding document:', error);
       addToast('Lỗi khi thêm tài liệu', 'error');
     }
   };

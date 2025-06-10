@@ -64,7 +64,7 @@ export interface KeHoach {
   id: string;
   tenKeHoach: string;
   userId: string;
-  donViId: string;
+  donViID: string;
   ngayBatDau: string;
   ngayKetThuc: string;
   ghiChu?: string;
@@ -177,4 +177,15 @@ export interface UpdateProfilePayload {
   email?: string;
   soDienThoai?: string;
   diaChi?: string;
+}
+
+export interface KeHoachTableProps {
+  keHoachs: KeHoach[];
+  activeTab: 'current' | 'deleted';
+  canEdit: boolean;
+  canHardDelete: boolean;
+  handleEdit: (keHoach: KeHoach) => void;
+  onConfirmDelete: (id: string, isHardDelete: boolean) => Promise<void>;
+  onConfirmRestore: (id: string) => Promise<void>;
+  onConfirmPermanentDelete: (id: string) => Promise<void>;
 }
