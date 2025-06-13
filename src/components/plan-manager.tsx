@@ -1,10 +1,9 @@
-// src/components/PlanManager.tsx
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CardContent } from '@/components/ui/card';
-import { PlusIcon, SearchIcon, Trash2 } from 'lucide-react';
+import { List, PlusIcon, SearchIcon } from 'lucide-react';
 import {
   Sheet,
   SheetTrigger,
@@ -122,8 +121,8 @@ const PlanManager: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a href='/danh_sach_ke_hoach'>
-                <Button variant="destructive" size="icon">
-                  <Trash2 className="size-4" />
+                <Button variant="outline" size="icon">
+                  <List className="size-4" />
                 </Button>
                 </a>
               </TooltipTrigger>
