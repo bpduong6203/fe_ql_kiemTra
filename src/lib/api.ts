@@ -29,7 +29,7 @@ export async function apiFetch<T = unknown>(
       const statusCode = axiosError.response.status;
       switch (statusCode) {
         case 401:
-          window.location.href = '/Unauthorized';
+          window.location.href = '/login';
           throw new Error('Bạn cần đăng nhập để truy cập');
         case 403:
           window.location.href = '/Forbidden';
